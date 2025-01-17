@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Product{% endblock %}
+
+{% block body %}
+    <h1>Edit Product</h1>
+
+    {{ form_start(form) }}
+    
+    <div>
+        <label for="name">Product Name</label>
+        {{ form_widget(form.name) }}
+    </div>
+
+    <div>
+        <label for="description">Product Description</label>
+        {{ form_widget(form.description) }}
+    </div>
+
+    <div>
+        <label for="price">Price</label>
+        {{ form_widget(form.price) }}
+    </div>
+
+    <div>
+        <label for="images">Images</label>
+        <div>
+            {% for index, image in product.images %}
+                <div class="image-checkbox">
+                    {{ form_row(form['remove_image_' ~ index]) }} <!-- Case à cocher -->
+                    <img src="{{ asset('uploads/images/' ~ image) }}" alt="Image" style="width: 100px; height: auto; margin-left: 10px;"/>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div>
+        <label for="new_images">New Images</label>
+        {{ form_widget(form.images) }}
+    </div>
+
+    {{ form_end(form) }}
+{% endblock %}

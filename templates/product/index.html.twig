@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Produits</h1>
+
+    {% if is_granted('ROLE_USER') %}
+        <a href="{{ path('product_new') }}">Ajouter un produit</a>
+    {% endif %}
+
+    <ul>
+        {% for product in products %}
+            <li>
+                {{ product.name }} - {{ product.price }} €
+                <a href="{{ path('product_show', {'id': product.id}) }}">Voir</a>
+                {% if product.user == app.user %}
+                    <a href="{{ path('product_edit', {'id': product.id}) }}">Modifier</a>
+                    <form method="post" action="{{ path('product_delete', {'id': product.id}) }}" style="display:inline-block;">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
+                        <button type="submit">Supprimer</button>
+                    </form>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
