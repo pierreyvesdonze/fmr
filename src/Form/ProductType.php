@@ -102,7 +102,11 @@ class ProductType extends AbstractType
                 'placeholder'  => "Marque (optionnel)",
                 'attr'         => [
                     'class' => 'uk-input',
-                ]
+                ],
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('b')
+                        ->orderBy('b.name', 'ASC'); // Tri par nom (ordre alphabétique)
+                }
             ])
             ->add('category', EntityType::class, [
                 'class'        => Category::class,
