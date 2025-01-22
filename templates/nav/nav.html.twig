@@ -1,26 +1,135 @@
-<nav uk-dropnav="align: center">
-    <ul class="uk-subnav uk-flex-center">
-        <li class="uk-active"><a href="#">Active</a></li>
-        <li>
-            <a href>Parent <span uk-drop-parent-icon></span></a>
-            <div class="uk-dropdown">
-                <ul class="uk-nav uk-dropdown-nav">
-                    <li class="uk-active"><a href="#">Active</a></li>
-                    <li><a href="#">Item</a></li>
-                    <li><a href="#">Item</a></li>
-                </ul>
+<div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky;">
+    <nav class="uk-navbar-container">
+        <div class="uk-container">
+            <div uk-navbar="dropbar: true; dropbar-anchor: !.uk-navbar-container; target-y: !.uk-navbar-container">
+                <div class="uk-navbar-center">
+                    <ul class="uk-navbar-nav">
+                        <li class="uk-active"><a href="{{ path('home') }}">
+                            <img src="{{ asset('assets/images/fmr_logo.png') }}" alt="" style="width: 40px;">
+                        </a></li>
+
+                        {# BOUTIQUE #}
+                        <li>
+                            <a href="#">Boutique</a>
+                            <div class="uk-navbar-dropdown uk-navbar-dropdown-width-2">
+                                <div class="uk-drop-grid uk-child-width-1-3" uk-grid>
+                                    <div>
+                                        <ul class="uk-nav uk-navbar-dropdown-nav">
+                                            <li class="uk-active">
+                                                <a href="#"><span class="material-symbols-outlined">apparel</span></a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ path('product_index', {mainCategory:"vetements", genderCategory: "femme"}) }}">Femme</a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ path('product_index', {mainCategory:"vetements", genderCategory: "homme"}) }}">Homme</a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ path('product_index', {mainCategory:"vetements", genderCategory: "enfant"}) }}">Enfant</a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ path('product_index', {mainCategory:"vetements", genderCategory: "tout"}) }}">Voir tout</a>
+                                            </li>
+                                            
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <ul class="uk-nav uk-navbar-dropdown-nav">
+                                            <li class="uk-active"><a href="#"><span class="material-symbols-outlined">
+                                                footprint
+                                            </span></a>
+                                            </li>
+                                            <li> <a href="{{ path('product_index', {mainCategory:"chaussures", genderCategory: "femme"}) }}">Femme</a></li>
+                                            <li> <a href="{{ path('product_index', {mainCategory:"chaussures", genderCategory: "homme"}) }}">Homme</a></li>
+                                            <li> <a href="{{ path('product_index', {mainCategory:"chaussures", genderCategory: "enfant"}) }}">Enfant</a></li>
+                                            <li>
+                                                <a href="{{ path('product_index', {mainCategory:"chaussures", genderCategory: "tout"}) }}">Voir tout</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <ul class="uk-nav uk-navbar-dropdown-nav">
+                                            <li class="uk-active"><a href="#"><span class="">
+                                                Accessoires
+                                            </span></a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ path('product_index', {mainCategory:"accessoires", genderCategory: "tout"}) }}">Voir tout</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                        {# UTILISATEUR #}
+                        <li>
+                            <a href="#"><span uk-icon="icon: user"></span></a>
+                            <div class="uk-navbar-dropdown uk-navbar-dropdown-width-3">
+                                <div class="uk-drop-grid uk-child-width-1-2@m uk-grid-large" uk-grid>
+                                    <div>
+                                        <ul class="uk-nav uk-navbar-dropdown-nav">
+                                            {% if app.user %}
+                                            <li class="uk-active"><a href="#">Gestion du compte</a></li>
+                                            <li><a href="{{ path('product_new') }}">Vendre un article</a></li>
+                                            <li><a href="#">Mon compte</a></li>
+                                            <li class="uk-nav-divider"></li>
+                                            <li><a href="{{ path('logout') }}"><span uk-icon="icon: sign-out"></span>
+                                                    Déconnexion</a></li>
+                                            {% else %}
+                                            <li><a href="{{ path('login') }}"><span uk-icon="icon: sign-in"></span> Se
+                                                    connecter</a></li>
+                                            <li><a href="{{ path('register') }}">S'enregistrer</a></li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+
+                                    <div>
+                                        <ul class="uk-nav uk-navbar-dropdown-nav">
+                                            <li class="uk-nav-header">Header</li>
+                                            <li><a href="#">Item</a></li>
+                                            <li><a href="#">Item</a></li>
+                                        </ul>
+                                    </div>
+
+                                    <div>
+                                        <ul class="uk-nav uk-navbar-dropdown-nav">
+                                            <li class="uk-nav-header">Header</li>
+                                            <li><a href="#">Item</a></li>
+                                            <li><a href="#">Item</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                        {# PANIER #}
+                        <li>
+                            <a href="#"><span uk-icon="icon: cart"></span></a>
+                            <div class="uk-navbar-dropdown uk-navbar-dropdown-width-3">
+                                <div class="uk-drop-grid uk-child-width-1-2@m uk-grid-large" uk-grid>
+
+                                    <div>
+                                        <ul class="uk-nav uk-navbar-dropdown-nav">
+                                            <li class="uk-nav-header">Panier</li>
+                                            <li><a href="#">Voir</a></li>
+                                            <li><a href="#">Item</a></li>
+                                        </ul>
+                                    </div>
+
+                                    <div>
+                                        <ul class="uk-nav uk-navbar-dropdown-nav">
+                                            <li class="uk-nav-header">Header</li>
+                                            <li><a href="#">Item</a></li>
+                                            <li><a href="#">Item</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </li>
-        <li>
-            <a href>Parent <span uk-drop-parent-icon></span></a>
-            <div class="uk-dropdown">
-                <ul class="uk-nav uk-dropdown-nav">
-                    <li class="uk-active"><a href="#">Active</a></li>
-                    <li><a href="#">Item</a></li>
-                    <li><a href="#">Item</a></li>
-                </ul>
-            </div>
-        </li>
-        <li><a href="#">Item</a></li>
-    </ul>
-</nav>
+        </div>
+    </nav>
+</div>

@@ -30,7 +30,6 @@ class RegistrationController extends AbstractController
             $this->addFlash('error', 'Vous êtes déjà enregistré et connecté.');
             return $this->redirectToRoute('home');
         }
-
         
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);

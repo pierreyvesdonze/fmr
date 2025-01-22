@@ -27,7 +27,19 @@ class ImageResizer
             $newFilename = uniqid() . '.' . $file->guessExtension();
             $path = $destination . '/' . $newFilename;
 
-            imagejpeg($resizedImage, $path, 90);
+            // Compression en fonction du type de l'image
+            $extension = strtolower($file->guessExtension());
+            if ($extension === 'jpeg' || $extension === 'jpg') {
+                // Compression pour JPEG
+                imagejpeg($resizedImage, $path, 80);
+            } elseif ($extension === 'png') {
+                // Compression pour PNG
+                imagepng($resizedImage, $path, 6); // 6 est un bon compromis pour la compression PNG
+            } elseif ($extension === 'webp') {
+                // Compression pour WebP
+                imagewebp($resizedImage, $path, 80); 
+            }
+
             imagedestroy($resizedImage);
         } else {
             $newFilename = uniqid() . '.' . $file->guessExtension();

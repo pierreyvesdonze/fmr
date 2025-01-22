@@ -19,31 +19,52 @@ class RegistrationFormType extends AbstractType
     {
         $builder
             ->add('email', TextType::class, [
-                'required' => true
+                'required'    => true,
+                'label'       => false,
+                'attr' => [
+                    'placeholder' => 'Email'
+                ]
+            ])
+            ->add('pseudo', TextType::class, [
+                'required'    => true,
+                'label'       => false,
+                'attr' => [
+                    'placeholder' => 'Votre pseudo publique'
+                ]
             ])
             ->add('plainPassword', RepeatedType::class, [
-                'type' => PasswordType::class,
+                'type'            => PasswordType::class,
                 'invalid_message' => 'Les 2 mots de passe doivent correspondre',
-                'mapped' => false,
-                'required' => true,
-                'first_options'  => ['label' => 'Mot de passe'],
-                'second_options' => ['label' => 'Confirmation du mot de passe'],
+                'mapped'          => false,
+                'required'        => true,
+                'first_options'  => [
+                    'label' => false,
+                    'attr'  => [
+                        'placeholder' => 'Mot de passe'
+                    ],
+                ],
+                'second_options' => [
+                    'label' => false,
+                    'attr'  => [
+                        'placeholder' => 'Confirmer le mot de passe'
+                    ],
+                ],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Entrez un mot de passe',
                     ]),
                     new Length([
-                        'min' => 6,
-                        'minMessage' => 'Votre mot de passe doit faire au minimum {{ limit }} characters',
-                        // max length allowed by Symfony for security reasons
-                        'max' => 4096,
+                        'min'        => 6,
+                        'minMessage' => 'Votre mot de passe doit faire au minimum {{ limit }} caractères',
+                        'max'        => 4096,
                     ]),
                 ],
             ])
+            
             ->add('submit', SubmitType::class, [
                 'label' => "M'enregistrer",
                 'attr' => [
-                    'class' => "custom-btn"
+                    'class' => "uk-button uk-button-default"
                 ]
             ]);
         ;

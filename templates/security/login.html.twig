@@ -3,39 +3,49 @@
 {% block title %}Connexion{% endblock %}
 
 {% block body %}
-<section class="login-section">
-    <div class="form-container" id="login-form">
-        <form method="post" name="login_form">
+<section class="uk-section uk-section-small uk-flex uk-flex-center">
+    <div class="uk-width-medium">
+        <h1 class="uk-heading-line"><span>Connexion</span></h1>
+
+        <form method="post" name="login_form" class="uk-form-stacked">
             {% if error %}
-            <div class="alert alert-danger">{{ 'Email ou mot de passe invalide' }}</div>
+                <div class="uk-alert-danger" uk-alert>
+                    <p>Email ou mot de passe invalide</p>
+                </div>
             {% endif %}
 
             {% if app.user %}
-            <div class="mb-3">
-                You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('logout') }}">Logout</a>
-            </div>
+                <div class="uk-alert-primary" uk-alert>
+                    Vous êtes connecté en tant que {{ app.user.userIdentifier }}, <a href="{{ path('logout') }}">Déconnexion</a>
+                </div>
             {% endif %}
 
-            <h1 class="h3 mb-3 font-weight-normal">Connexion</h1>
-            <label for="inputEmail">Email</label>
-            <input type="email" value="{{ last_username }}" name="_username" id="inputEmail" class="form-control"
-                autocomplete="email" required autofocus>
-            <label for="inputPassword">Mot de passe</label>
-            <input type="password" name="_password" id="inputPassword" class="form-control"
-                autocomplete="current-password" required>
+            <div class="uk-margin">
+                <div class="uk-form-controls">
+                    <input type="email" value="{{ last_username }}" name="_username" id="inputEmail" 
+                           class="uk-input" autocomplete="email" required autofocus 
+                           placeholder="Email">
+                </div>
+            </div>
+
+            <div class="uk-margin">
+                <div class="uk-form-controls">
+                    <input type="password" name="_password" id="inputPassword" 
+                           class="uk-input" autocomplete="current-password" required 
+                           placeholder="Mot de passe">
+                </div>
+            </div>
 
             <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-            <br>
-            <br>
+            {# Lien pour mot de passe oublié  #}
+            <div class="uk-margin">
+                <a href="{{ path('forgot_password_request') }}" class="uk-link-text">Mot de passe oublié ?</a>
+            </div>
 
-         {#    <a href="{{ path('app_forgot_password_request') }}">Mot de passe oublié</a> #}
-
-            <br><br>
-
-            <button class="custom-btn" type="submit">
-                Connexion
-            </button>
+            <div class="uk-margin">
+                <button type="submit" class="uk-button uk-button-default uk-width-1-1">Connexion</button>
+            </div>
         </form>
     </div>
 </section>

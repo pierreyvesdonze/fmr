@@ -1,43 +1,86 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Product{% endblock %}
+{% block title %}Modifier le produit{% endblock %}
 
 {% block body %}
-    <h1>Edit Product</h1>
+<h1>Modifier le produit</h1>
 
-    {{ form_start(form) }}
-    
-    <div>
-        <label for="name">Product Name</label>
-        {{ form_widget(form.name) }}
-    </div>
+{{ form_start(form) }}
 
-    <div>
-        <label for="description">Product Description</label>
-        {{ form_widget(form.description) }}
-    </div>
-
-    <div>
-        <label for="price">Price</label>
-        {{ form_widget(form.price) }}
-    </div>
-
-    <div>
-        <label for="images">Images</label>
-        <div>
-            {% for index, image in product.images %}
-                <div class="image-checkbox">
-                    {{ form_row(form['remove_image_' ~ index]) }} <!-- Case à cocher -->
-                    <img src="{{ asset('uploads/images/' ~ image) }}" alt="Image" style="width: 100px; height: auto; margin-left: 10px;"/>
-                </div>
-            {% endfor %}
+<section class="custom-form">
+    <fieldset class="uk-fieldset">
+        <div class="uk-margin">
+            {{ form_widget(form.genderCategory) }}
         </div>
-    </div>
 
-    <div>
-        <label for="new_images">New Images</label>
-        {{ form_widget(form.images) }}
-    </div>
+        <div class="uk-margin">
+            {{ form_widget(form.name) }}
+        </div>
 
-    {{ form_end(form) }}
+        <div class="uk-margin">
+            {{ form_widget(form.description) }}
+        </div>
+
+        <div class="uk-margin">
+            {{ form_widget(form.price) }}
+        </div>
+
+        <div class="uk-margin">
+            {{ form_widget(form.size) }}
+        </div>
+
+        <div class="uk-margin">
+            {{ form_widget(form.color) }}
+        </div>
+
+        <div class="uk-margin">
+            {{ form_widget(form.brand) }}
+        </div>
+
+        <div class="uk-margin">
+            {{ form_widget(form.wear) }}
+        </div>
+
+        <div class="uk-margin">
+            {{ form_widget(form.category) }}
+        </div>
+
+        <div>
+            <div class="image-checkbox">
+                <img src="{{ asset('uploads/images/' ~ product.mainImage) }}" alt="Image"
+                    style="width: 100px; height: auto; margin-left: 10px;" />
+            </div>
+        </div>
+
+        <div class="uk-margin">
+            {{ form_label(form.mainImage) }}
+            {{ form_widget(form.mainImage) }}
+            {{ form_errors(form.mainImage) }}
+        </div>
+
+        <div>
+            <div>
+                {% for index, image in product.images %}
+                <div class="image-checkbox">
+                    <img src="{{ asset('uploads/images/' ~ image) }}" alt="Image"
+                        style="width: 100px; height: auto; margin-left: 10px;" />
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="uk-margin">
+            {{ form_label(form.images) }}
+            <p>Attention, le téléchargement d'une ou plusieurs images réinitialisera les images déjà présentes</p>
+            {{ form_widget(form.images) }}
+            {{ form_errors(form.images) }}
+        </div>
+
+        <div class="uk-margin">
+            {{ form_widget(form.save) }}
+        </div>
+    </fieldset>
+</section>
+
+{{ form_end(form) }}
 {% endblock %}

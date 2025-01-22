@@ -1,11 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}FMR{% endblock %}
-
 {% block body %}
 
 {# Main title #}
-<div class="uk-height-large uk-background-cover uk-light uk-flex uk-flex-column uk-flex-center" uk-parallax="bgy: -400" style="background-image: url('images/main-bg-title.jpg'); height: 90vh;">
+<div class="uk-height-large uk-background-cover uk-light uk-flex uk-flex-column uk-flex-center" uk-parallax="bgy: -400" style="background-image: url('assets/images/main-bg-title.jpg'); height: 90vh;">
     <div class="uk-text-center">
         <h1 class="uk-width-2-2@m" uk-parallax="y: 100,0">F M R</h1>
         <br>
@@ -14,8 +12,8 @@
         <p class="uk-text-white uk-margin-small-top" style="font-size: 0.8rem; letter-spacing: 2px;">Since 1983</p>
         <br><br><br>
         <p uk-margin>
-            <a class="uk-button uk-button-default" href="#">Acheter</a>
-            <a class="uk-button uk-button-default" href="#">Vendre</a>
+            <a class="uk-button uk-button-default" href="{{ path('product_index', {mainCategory: "vetements", genderCategory:'tout'}) }}">Voir la boutique</a>
+            <a class="uk-button uk-button-default" href="{{ path('product_new') }}">Vendre un article</a>
         </p>
     </div>
 </div>
@@ -44,12 +42,11 @@
 </div>
 
 {# 1er slogan #}
-<div id="test-start-end" class="uk-height-large uk-background-cover uk-overflow-hidden uk-light uk-flex" style="background-image: url('images/white-clothes-bg.jpg');">
+<div id="test-start-end" class="uk-height-large uk-background-cover uk-overflow-hidden uk-light uk-flex" style="background-image: url('assets/images/white-clothes-bg.jpg');">
     <div class="uk-grid uk-margin-auto uk-flex-inline">
-       <div><div class="uk-card uk-card-default uk-padding-small" uk-parallax="target: #test-start-end; y: 398; easing: 0;">Dépensez</div></div>
-       <div><div class="uk-card uk-card-default uk-padding-small" uk-parallax="target: #test-start-end; start: 100%; end: 100%; y: 398; easing: 0;">moins</div></div>
-       <div><div class="uk-card uk-card-default uk-padding-small" uk-parallax="target: #test-start-end; start: 30vh; end: 30vh; y: 398; easing: 0;">gagnez</div></div>
-       <div><div class="uk-card uk-card-default uk-padding-small" uk-parallax="target: #test-start-end; start: 100% + 100; end: 100% + 100; y: 398; easing: 0;">plus</div></div>
+       <div><div class="uk-card uk-card-default uk-padding-small" uk-parallax="target: #test-start-end; y: 398; easing: 0;">Vends</div></div>
+       <div><div class="uk-card uk-card-default uk-padding-small" uk-parallax="target: #test-start-end; start: 100%; end: 100%; y: 398; easing: 0;">tes</div></div>
+       <div><div class="uk-card uk-card-default uk-padding-small" uk-parallax="target: #test-start-end; start: 30vh; end: 30vh; y: 398; easing: 0;">fringues</div></div>
    </div>
 </div>
 
@@ -57,7 +54,7 @@
 
 {# Promotion slogan #}
 <div>
-    <h1 style="font-size: 4em;">-50% sur 150€ d'achat à la première commande</h1>
+    <h1 style="font-size: 4em;">De nouveaux articles chaque jour</h1>
 </div>
 
 <br><br><br>
@@ -67,44 +64,44 @@
 
     <div class="uk-slider-items uk-child-width-1-2 uk-child-width-1-3@s uk-child-width-1-4@m uk-light">
         <div>
-            <img src="images/slider1.jpg" width="400" height="600" alt="">
-            <div class="uk-position-center uk-panel"><h1>1</h1></div>
+            <img src="assets/images/slider1.jpg" width="400" height="600" alt="">
+            <div class="uk-position-center uk-panel"></div>
         </div>
         <div>
-            <img src="images/slider2.jpg" width="400" height="600" alt="">
-            <div class="uk-position-center uk-panel"><h1>2</h1></div>
+            <img src="assets/images/slider2.jpg" width="400" height="600" alt="">
+            <div class="uk-position-center uk-panel"></div>
         </div>
         <div>
-            <img src="images/slider3.jpg" width="400" height="600" alt="">
-            <div class="uk-position-center uk-panel"><h1>3</h1></div>
+            <img src="assets/images/slider3.jpg" width="400" height="600" alt="">
+            <div class="uk-position-center uk-panel"></div>
         </div>
         <div>
-            <img src="images/slider4.jpg" width="400" height="600" alt="">
-            <div class="uk-position-center uk-panel"><h1>4</h1></div>
+            <img src="assets/images/slider4.jpg" width="400" height="600" alt="">
+            <div class="uk-position-center uk-panel"></div>
         </div>
         <div>
-            <img src="images/slider5.jpg" width="400" height="600" alt="">
-            <div class="uk-position-center uk-panel"><h1>5</h1></div>
+            <img src="assets/images/slider5.jpg" width="400" height="600" alt="">
+            <div class="uk-position-center uk-panel"></div>
         </div>
         <div>
-            <img src="images/slider1.jpg" width="400" height="600" alt="">
-            <div class="uk-position-center uk-panel"><h1>6</h1></div>
+            <img src="assets/images/slider1.jpg" width="400" height="600" alt="">
+            <div class="uk-position-center uk-panel"></div>
         </div>
         <div>
-            <img src="images/slider2.jpg" width="400" height="600" alt="">
-            <div class="uk-position-center uk-panel"><h1>7</h1></div>
+            <img src="assets/images/slider2.jpg" width="400" height="600" alt="">
+            <div class="uk-position-center uk-panel"></div>
         </div>
         <div>
-            <img src="images/slider3.jpg" width="400" height="600" alt="">
-            <div class="uk-position-center uk-panel"><h1>8</h1></div>
+            <img src="assets/images/slider3.jpg" width="400" height="600" alt="">
+            <div class="uk-position-center uk-panel"></div>
         </div>
         <div>
-            <img src="images/slider4.jpg" width="400" height="600" alt="">
-            <div class="uk-position-center uk-panel"><h1>9</h1></div>
+            <img src="assets/images/slider4.jpg" width="400" height="600" alt="">
+            <div class="uk-position-center uk-panel"></div>
         </div>
         <div>
-            <img src="images/slider5.jpg" width="400" height="600" alt="">
-            <div class="uk-position-center uk-panel"><h1>10</h1></div>
+            <img src="assets/images/slider5.jpg" width="400" height="600" alt="">
+            <div class="uk-position-center uk-panel"></div>
         </div>
     </div>
     <ul class="uk-slider-nav uk-dotnav uk-flex-center uk-margin"></ul>
@@ -113,12 +110,12 @@
 {# blur #}
 <div id="test-filter" class="uk-height-large uk-background-cover uk-overflow-hidden uk-flex" uk-parallax="start: 100%; end: 100%; sepia: 100;" style="background-image: url('images/light.jpg');">
 
-    <h1 class="uk-width-1-2@m uk-text-center uk-margin-auto uk-margin-auto-vertical" uk-parallax="target: #test-filter; start: 100%; end: 100%; blur: 0,10;">FMR</h1>
+    <h1 class="uk-width-1-2@m uk-text-center uk-margin-auto uk-margin-auto-vertical" uk-parallax="target: #test-filter; start: 100%; end: 100%; blur: 0,10;"><img src="{{ asset('assets/images/fmr_logo.png') }}" alt="" style="width: 140px;"></h1>
 </div>
 
 
 {# parallax de fin #}
-<div class="uk-height-large uk-background-cover uk-overflow-hidden uk-light uk-flex" style="background-image: url('images/parallax-title.jpg');">
+<div class="uk-height-large uk-background-cover uk-overflow-hidden uk-light uk-flex" style="background-image: url('assets/images/parallax-title.jpg');">
     <div class="uk-width-1-2@m uk-text-center uk-margin-auto uk-margin-auto-vertical">
         <h1 uk-parallax="opacity: 0,1; y: -100,0; scale: 2,1; end: 50vh + 50%;">F M R</h1>
         <p uk-parallax="opacity: 0,1; y: 100,0; scale: 0.5,1; end: 50vh + 50%;">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
@@ -130,12 +127,12 @@
 <div class="uk-flex uk-flex-center">
     <div class="uk-card uk-card-default uk-card-body">
         <p uk-margin>
-            <a class="uk-button uk-button-default" href="#">Acheter</a>
+            <a class="uk-button uk-button-default" href="{{ path('product_index', {mainCategory:"vetements", genderCategory:'tout'}) }}">Voir la boutique</a>
         </p>
     </div>
     <div class="uk-card uk-card-default uk-card-body uk-margin-left">
         <p uk-margin>
-            <a class="uk-button uk-button-default" href="#">Vendre</a>
+            <a class="uk-button uk-button-default" href="{{ path('product_new') }}">Vendre un article</a>
         </p>
     </div>
 </div>

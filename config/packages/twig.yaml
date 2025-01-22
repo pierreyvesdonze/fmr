@@ -4,3 +4,6 @@ twig:
 when@test:
     twig:
         strict_variables: true
+
+knp_paginator:
+    page_range: 3 

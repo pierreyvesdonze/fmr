@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\ProductRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -38,15 +36,6 @@ class Product
     #[ORM\Column]
     private ?int $stock = null;
 
-    #[ORM\Column(length: 24, nullable: true)]
-    private ?string $size = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $brand = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $color = null;
-
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2, nullable: true)]
     private ?string $discount = null;
 
@@ -56,6 +45,30 @@ class Product
 
     #[ORM\ManyToOne(inversedBy: 'products')]
     private ?Cart $cart = null;
+
+    #[ORM\Column]
+    private ?bool $sold = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $wear = null;
+
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    private ?Brand $brand = null;
+
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Color $color = null;
+
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Size $size = null;
+
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?GenderCategory $genderCategory = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $mainImage = null;
 
     public function getId(): ?int
     {
@@ -163,42 +176,6 @@ class Product
         return $this;
     }
 
-    public function getSize(): ?string
-    {
-        return $this->size;
-    }
-
-    public function setSize(?string $size): static
-    {
-        $this->size = $size;
-
-        return $this;
-    }
-
-    public function getBrand(): ?string
-    {
-        return $this->brand;
-    }
-
-    public function setBrand(?string $brand): static
-    {
-        $this->brand = $brand;
-
-        return $this;
-    }
-
-    public function getColor(): ?string
-    {
-        return $this->color;
-    }
-
-    public function setColor(string $color): static
-    {
-        $this->color = $color;
-
-        return $this;
-    }
-
     public function getDiscount(): ?string
     {
         return $this->discount;
@@ -231,6 +208,90 @@ class Product
     public function setCart(?Cart $cart): static
     {
         $this->cart = $cart;
+
+        return $this;
+    }
+
+    public function isSold(): ?bool
+    {
+        return $this->sold;
+    }
+
+    public function setSold(bool $sold): static
+    {
+        $this->sold = $sold;
+
+        return $this;
+    }
+
+    public function getWear(): ?string
+    {
+        return $this->wear;
+    }
+
+    public function setWear(string $wear): static
+    {
+        $this->wear = $wear;
+
+        return $this;
+    }
+
+    public function getBrand(): ?Brand
+    {
+        return $this->brand;
+    }
+
+    public function setBrand(?Brand $brand): static
+    {
+        $this->brand = $brand;
+
+        return $this;
+    }
+
+    public function getColor(): ?Color
+    {
+        return $this->color;
+    }
+
+    public function setColor(?Color $color): static
+    {
+        $this->color = $color;
+
+        return $this;
+    }
+
+    public function getSize(): ?Size
+    {
+        return $this->size;
+    }
+
+    public function setSize(?Size $size): static
+    {
+        $this->size = $size;
+
+        return $this;
+    }
+
+    public function getGenderCategory(): ?GenderCategory
+    {
+        return $this->genderCategory;
+    }
+
+    public function setGenderCategory(?GenderCategory $genderCategory): static
+    {
+        $this->genderCategory = $genderCategory;
+
+        return $this;
+    }
+
+    public function getMainImage(): ?string
+    {
+        return $this->mainImage;
+    }
+
+    public function setMainImage(?string $mainImage): static
+    {
+        $this->mainImage = $mainImage;
 
         return $this;
     }

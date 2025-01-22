@@ -1,0 +1,71 @@
+/*
+***********************************
+MEDIA QUERIES
+***********************************
+*/
+/*
+*******************************
+CONTAINERS
+*******************************
+*/
+.div-flex {
+  display: flex;
+  justify-content: center;
+  max-width: 100%;
+  flex-direction: row;
+  padding: 20px;
+}
+@media (min-width: 576px) and (max-width: 768px) {
+  .div-flex {
+    flex-direction: column;
+  }
+}
+@media (min-width: 300px) and (max-width: 576px) {
+  .div-flex {
+    flex-direction: column;
+  }
+}
+
+/*
+*******************************
+FORMULAIRES
+*******************************
+*/
+.custom-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+/*
+*******************************
+ICONES
+*******************************
+*/
+.material-symbols-outlined {
+  font-size: 40px !important;
+  font-variation-settings: "FILL" 0, "wght" 100, "GRAD" 0, "opsz" 40;
+}
+
+/**********************
+PAGINATOR
+**********************/
+.pagination {
+  justify-content: center;
+}
+
+.first,
+.current,
+.page,
+.next,
+.previous,
+.last {
+  padding-right: 0.4em;
+  padding-left: 0.4em;
+  font-size: 1.1em;
+}
+
+.current {
+  font-size: 2em !important;
+}/*# sourceMappingURL=style.css.map */

@@ -15,15 +15,15 @@ class Cart
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(inversedBy: 'cart', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'cart')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
     /**
-     * @var Collection<int, Product>
+     * @var Collection<int, CartItem>
      */
-    #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'cart')]
-    private Collection $products;
+    #[ORM\OneToMany(targetEntity: CartItem::class, mappedBy: 'cart')]
+    private Collection $cartItems;
 
     #[ORM\Column]
     private ?float $totalPrice = null;
@@ -39,7 +39,7 @@ class Cart
 
     public function __construct()
     {
-        $this->products = new ArrayCollection();
+        $this->cartItems = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -55,34 +55,33 @@ class Cart
     public function setUser(User $user): static
     {
         $this->user = $user;
-
         return $this;
     }
 
     /**
-     * @return Collection<int, Product>
+     * @return Collection<int, CartItem>
      */
-    public function getProducts(): Collection
+    public function getCartItems(): Collection
     {
-        return $this->products;
+        return $this->cartItems;
     }
 
-    public function addProduct(Product $product): static
+    public function addCartItem(CartItem $cartItem): static
     {
-        if (!$this->products->contains($product)) {
-            $this->products->add($product);
-            $product->setCart($this);
+        if (!$this->cartItems->contains($cartItem)) {
+            $this->cartItems->add($cartItem);
+            $cartItem->setCart($this);
         }
 
         return $this;
     }
 
-    public function removeProduct(Product $product): static
+    public function removeCartItem(CartItem $cartItem): static
     {
-        if ($this->products->removeElement($product)) {
+        if ($this->cartItems->removeElement($cartItem)) {
             // set the owning side to null (unless already changed)
-            if ($product->getCart() === $this) {
-                $product->setCart(null);
+            if ($cartItem->getCart() === $this) {
+                $cartItem->setCart(null);
             }
         }
 

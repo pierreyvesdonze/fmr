@@ -2,37 +2,119 @@
 
 namespace App\Controller;
 
+use App\Entity\GenderCategory;
 use App\Entity\Product;
 use App\Form\ProductType;
+use App\Form\FilterProductType;
+use App\Repository\BrandRepository;
+use App\Repository\CategoryRepository;
+use App\Repository\ColorRepository;
+use App\Repository\GenderCategoryRepository;
+use App\Repository\MainCategoryRepository;
 use App\Repository\ProductRepository;
+use App\Repository\SizeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Service\ImageResizer;
-use Symfony\Component\HttpFoundation\File\File;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-#[Route('/product')]
+#[Route('/article')]
 final class ProductController extends AbstractController
 {
-    #[Route(name: 'product_index', methods: ['GET'])]
-    public function index(ProductRepository $productRepository): Response
+    #[Route('s/{mainCategory}/{genderCategory}', name: 'product_index', methods: ['GET', 'POST'])]
+    public function index(
+        ProductRepository $productRepository,
+        CategoryRepository $categoryRepository,
+        SizeRepository $sizeRepository,
+        BrandRepository $brandRepository,
+        ColorRepository $colorRepository,
+        MainCategoryRepository $mainCategoryRepository,
+        GenderCategoryRepository $genderCategoryRepository,
+        PaginatorInterface $paginator,
+        Request $request,
+        string $mainCategory,
+        string $genderCategory
+        ): Response
     {
+        $form = $this->createForm(FilterProductType::class, null, [
+            'categories'       => $categoryRepository->findAll(),
+            'sizes'            => $sizeRepository->findAll(),
+            'brands'           => $brandRepository->findAll(),
+            'colors'           => $colorRepository->findAll(),
+            'mainCategories'   => $mainCategoryRepository->findAll(),
+            'genderCategories' => $genderCategoryRepository->findAll(),
+        ]);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Si le formulaire est soumis et valide, on récupère les données directement
+            $data = $form->getData();  // Données du formulaire
+            $products = $productRepository->findFilteredProducts($data);
+        } else {
+            // Sinon, filtrage selon la catégorie principale et la catégorie de genre
+            if ($mainCategory) {
+                if ($genderCategory === 'tout') {
+                    $products = $productRepository->findByMainCategory($mainCategory);
+                } else {
+                    $products = $productRepository->findByMainCategoryAndGender($mainCategory, $genderCategory);
+                }
+            } else {
+                // Gérer le cas où aucune catégorie principale n'est sélectionnée
+                $products = $productRepository->findRandomAllProducts();
+            }
+        }
+
+        // Pagination avec limite de 21 articles par page
+        $pagination = $paginator->paginate(
+            $products,
+            $request->query->getInt('page', 1), 21
+        );
+
         return $this->render('product/index.html.twig', [
-            'products' => $productRepository->findAll(),
+            'products'       => $pagination,
+            'genderCategory' => $genderCategory,
+            'form'           => $form->createView()
         ]);
     }
 
-    #[Route('/new', name: 'product_new', methods: ['GET', 'POST'])]
+    #[Route('s/utilisateur/{userId}', name: 'product_user_index', methods: ['GET'])]
+    public function userProducts(
+        ProductRepository $productRepository,
+        string $userId
+        ): Response
+    {
+        $products = $productRepository->findByUserId($userId);
+
+        return $this->render('product/index.html.twig', [
+            'products' => $products
+        ]);
+    }
+
+    #[Route('/nouveau', name: 'product_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, ImageResizer $imageResizer): Response
     {
+        if(!$this->getUser()) {
+            $this->addFlash('success', 'Vous devez être connecté(e) pour ajouter un article');
+            return $this->redirectToRoute('product_index');
+        }
+
         $product = new Product();
         $form = $this->createForm(ProductType::class, $product);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $mainImage = $form->get('mainImage')->getData();
+            $mainImagePath = null;
+
+            if($mainImage) {
+                $mainImagePath = $imageResizer->resize($mainImage, $this->getParameter('images_directory'));
+            }
+
             $images = $form->get('images')->getData();
             $imagePaths = [];
             if ($images) {
@@ -41,14 +123,25 @@ final class ProductController extends AbstractController
                 }
             }
 
+            $product->setMainImage($mainImagePath);
             $product->setImages($imagePaths);
             $product->setUser($this->getUser());
             $product->setCreatedAt(new \DateTimeImmutable());
+            $product->setStock(1);
+            $product->setSold(false);
 
             $entityManager->persist($product);
             $entityManager->flush();
 
-            return $this->redirectToRoute('product_index', [], Response::HTTP_SEE_OTHER);
+            if ($this->getUser()->getIban() != null) {
+                $this->addFlash('success', 'Nouveau produit ajouté !');
+            } else {
+                $this->addFlash('success', "Produit ajouté. N'oublie pas d'ajouter également un IBAN dans ton espace perso");
+            }
+
+            return $this->redirectToRoute('product_show', [
+                'id' => $product->getId()
+            ], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('product/new.html.twig', [
@@ -65,49 +158,77 @@ final class ProductController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'product_edit')]
-    public function edit(Product $product, Request $request, Filesystem $filesystem, EntityManagerInterface $entityManager): Response
-    {
+    #[Route('/{id}/modifier', name: 'product_edit')]
+    public function edit(
+        Product $product,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        ImageResizer $imageResizer
+    ): Response {
         $form = $this->createForm(ProductType::class, $product);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $mainImage = $form->get('mainImage')->getData();
+            $oldMainImage = $product->getMainImage();
+            
+            if ($mainImage) {
+                // Supprimer l'ancienne image principale si elle existe
+                if ($oldMainImage) {
+                    $oldMainImagePath = $this->getParameter('images_directory') . '/' . $oldMainImage;
+                    if (file_exists($oldMainImagePath)) {
+                        unlink($oldMainImagePath);
+                    }
+                }
+    
+                // Ajouter la nouvelle image principale
+                $mainImagePath = $imageResizer->resize($mainImage, $this->getParameter('images_directory'));
+                $product->setMainImage($mainImagePath);
+            }
+
             $images = $form->get('images')->getData();
-            if ($images) {
+            $imagePaths = [];
+
+            $oldImages = $product->getImages();
+            $images = $form->get('images')->getData(); // Récupère les nouvelles images
+
+            // Si de nouvelles images sont téléchargées
+            if ($images !== null && count($images) > 0) {
+                // Redimensionne et ajoute les nouvelles images
+                $imagePaths = [];
                 foreach ($images as $image) {
-                    $newImageName = uniqid() . '.' . $image->guessExtension();
-                    $image->move(
-                        $this->getParameter('images_directory'),
-                        $newImageName
-                    );
-                    $product->addImage($newImageName);
+                    // Redimensionner et déplacer l'image, comme dans votre service ImageResizer
+                    $imagePaths[] = $imageResizer->resize($image, $this->getParameter('images_directory'));
                 }
+                $product->setImages($imagePaths); // Ajoute les nouvelles images au produit
+
+                // Supprime les anciennes images
+                if ($oldImages) {
+                    foreach ($oldImages as $oldImage) {
+                        $oldImagePath = $this->getParameter('images_directory') . '/' . $oldImage;
+                        if (file_exists($oldImagePath)) {
+                            unlink($oldImagePath); // Supprime l'ancienne image
+                        }
+                    }
+                }
+            } else {
+                // Si aucune image n'est téléchargée, on ne touche pas aux anciennes images
+                $product->setImages($oldImages); // Les anciennes images restent intactes
             }
 
-            // Gestion de la suppression des images
-            $imagesToRemove = [];
-            foreach ($product->getImages() as $index => $image) {
-                $removeImage = $form->get('remove_image_' . $index)->getData();
-                if ($removeImage) {
-                    $imagesToRemove[] = $image;
-                }
-            }
+            $product->setUser($this->getUser());
+            $product->setCreatedAt(new \DateTimeImmutable());
 
-            // Retirer les images de la base de données
-            $product->setImages(array_diff($product->getImages(), $imagesToRemove));
-
-            // Supprimer les fichiers d'images du disque
-            foreach ($imagesToRemove as $image) {
-                $imagePath = $this->getParameter('images_directory') . '/' . $image;
-                if ($filesystem->exists($imagePath)) {
-                    $filesystem->remove($imagePath);
-                }
-            }
-
-            // Enregistrer le produit (les nouvelles images sont déjà gérées par le form)
+            $entityManager->persist($product);
             $entityManager->flush();
 
-            return $this->redirectToRoute('product_edit', ['id' => $product->getId()]);
+            if ($this->getUser()->getIban() != null) {
+                $this->addFlash('success', 'Produit modifié !');
+            } else {
+                $this->addFlash('success', "Produit modifié. N'oublie pas d'ajouter également un IBAN dans ton espace perso");
+            }
+
+            return $this->redirectToRoute('product_show', ['id' => $product->getId()]);
         }
 
         return $this->render('product/edit.html.twig', [
@@ -116,7 +237,7 @@ final class ProductController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'product_delete', methods: ['POST'])]
+    #[Route('/{id}/supprimer', name: 'product_delete', methods: ['POST'])]
     public function delete(
         Request $request,
         Product $product,
@@ -139,6 +260,8 @@ final class ProductController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('product_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('product_index', [
+            'genderCategory' => 'tout'
+        ], Response::HTTP_SEE_OTHER);
     }
 }

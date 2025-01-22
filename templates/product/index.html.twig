@@ -1,25 +1,98 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}| Boutique{% endblock %}
+
 {% block body %}
-    <h1>Produits</h1>
 
-    {% if is_granted('ROLE_USER') %}
-        <a href="{{ path('product_new') }}">Ajouter un produit</a>
-    {% endif %}
+<div class="uk-container uk-flex uk-flex-center uk-margin-medium-top">
 
-    <ul>
+    {# Filtres #}
+    <div class="uk-inline">
+        <button class="uk-button uk-button-default" type="button" uk-toggle="target: #filterForm; animation: uk-animation-fade">
+            <span uk-icon="icon: settings"></span> Filtres
+        </button>
+        
+        <div id="filterForm" hidden class="uk-card uk-card-default uk-card-body uk-margin-top">
+            <section class="custom-form">
+                <fieldset class="uk-fieldset">
+                    {{ form_start(form) }}
+                    
+                    <div class="uk-margin">
+                        {{ form_row(form.genderCategory) }}
+                    </div>
+                    <div class="uk-margin">
+                        {{ form_row(form.mainCategory) }}
+                    </div>
+                    <div class="uk-margin">
+                        {{ form_row(form.category) }}
+                    </div>
+                    <div class="uk-margin">
+                        {{ form_row(form.size) }}
+                    </div>
+                    <div class="uk-margin">
+                        {{ form_row(form.brand) }}
+                    </div>
+                    <div class="uk-margin">
+                        {{ form_row(form.color) }}
+                    </div>
+                    <div class="uk-margin">
+                        {{ form_row(form.filter) }}
+                    </div>
+
+                    {{ form_end(form) }}
+                </fieldset>
+            </section>
+        </div>
+    </div>
+</div>
+
+<hr class="uk-divider-icon">
+
+<div class="uk-container uk-flex uk-flex-center" style="max-width: 1280px;">
+    {% if products|length > 0 %}
+    <div class="uk-grid-small uk-child-width-1-2@s uk-child-width-1-3@m uk-child-width-1-4@l" uk-grid
+        uk-scrollspy="cls: uk-animation-slide-bottom; target: .uk-card; delay: 150; repeat: false">
         {% for product in products %}
-            <li>
-                {{ product.name }} - {{ product.price }} €
-                <a href="{{ path('product_show', {'id': product.id}) }}">Voir</a>
-                {% if product.user == app.user %}
-                    <a href="{{ path('product_edit', {'id': product.id}) }}">Modifier</a>
-                    <form method="post" action="{{ path('product_delete', {'id': product.id}) }}" style="display:inline-block;">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
-                        <button type="submit">Supprimer</button>
-                    </form>
-                {% endif %}
-            </li>
+        <div style="margin: 20px;">
+            <div class="uk-card uk-card-default" style="width: 320px; height: 450px;">
+                <div class="uk-card-media-top uk-flex uk-flex-center uk-flex-middle"
+                    style="width: 100%; height: 200px; overflow: hidden;">
+                    {% if product.mainImage is not empty %}
+                    <img src="{{ asset('uploads/images/' ~ product.mainImage) }}"
+                        style="width: 100%; height: 100%; object-fit: cover;" alt="">
+                    {% endif %}
+                </div>
+                <div class="uk-card-body">
+                    <h3 class="uk-card-title">{{ product.name }}</h3>
+                    <p class="uk-text-meta uk-margin-remove-top">{{ product.size }} - {{ product.wear }} - {{
+                        product.color }} - {{ product.brand }}
+                    </p>
+                    <a class="uk-link-muted" href="{{ path('product_user_index', {'userId': product.user.id}) }}"><span
+                            uk-icon="star"></span> {{ product.user.pseudo }}</a>
+                    <br>
+                    <br>
+                    <a class="uk-button uk-button-default" href="{{ path('product_show', {id: product.id}) }}">Voir</a>
+                </div>
+            </div>
+        </div>
         {% endfor %}
-    </ul>
+
+        <div class="paginator uk-flex uk-flex-center uk-flex-middle">
+            {{ knp_pagination_render(products) }}
+        </div>
+    </div>
+
+    {% else %}
+
+    <div class="uk-text-center uk-margin-large-top">
+        <h3>Désolé, aucun produit n'a été trouvé en fonction de ces critères.</h3>
+        
+        <div class="uk-margin-medium-top">
+            <a class="uk-link-muted" href="{{ path('product_index', {mainCategory:'vetements', genderCategory:'tout'}) }}">
+                Retour à la boutique
+            </a>
+        </div>
+    </div>
+{% endif %}
+</div>
 {% endblock %}

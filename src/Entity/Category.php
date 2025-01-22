@@ -31,6 +31,10 @@ class Category
     #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'category')]
     private Collection $products;
 
+    #[ORM\ManyToOne(inversedBy: 'categories')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?MainCategory $mainCategory = null;
+
     public function __construct()
     {
         $this->products = new ArrayCollection();
@@ -103,6 +107,18 @@ class Category
                 $product->setCategory(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getMainCategory(): ?MainCategory
+    {
+        return $this->mainCategory;
+    }
+
+    public function setMainCategory(?MainCategory $mainCategory): static
+    {
+        $this->mainCategory = $mainCategory;
 
         return $this;
     }

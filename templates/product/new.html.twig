@@ -1,11 +1,69 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Product{% endblock %}
+{% block title %}| Vendre un article{% endblock %}
 
 {% block body %}
-    <h1>Create new Product</h1>
 
-    {{ include('product/_form.html.twig') }}
+{{ form_start(form) }}
 
-    <a href="{{ path('product_index') }}">back to list</a>
+<section class="custom-form">
+    <h1>Vendre un article</h1>
+    <br><br><br>
+    <fieldset class="uk-fieldset">
+
+        <div class="uk-margin">
+            {{ form_widget(form.category) }}
+        </div>
+
+        <div class="uk-margin">
+            {{ form_widget(form.genderCategory) }}
+        </div>
+
+        <div class="uk-margin">
+            {{ form_widget(form.name) }}
+        </div>
+
+        <div class="uk-margin">
+            {{ form_widget(form.description) }}
+        </div>
+
+        <div class="uk-margin">
+            {{ form_widget(form.price) }}
+        </div>
+
+        <div class="uk-margin">
+            {{ form_widget(form.size) }}
+        </div>
+
+        <div class="uk-margin">
+            {{ form_widget(form.color) }}
+        </div>
+
+        <div class="uk-margin">
+            {{ form_widget(form.brand) }}
+        </div>
+
+        <div class="uk-margin">
+            {{ form_widget(form.wear) }}
+        </div>
+
+        <div class="uk-margin">
+            {{ form_label(form.mainImage) }}
+            {{ form_widget(form.mainImage) }}
+            {{ form_errors(form.mainImage) }}
+        </div>
+
+        <div class="uk-margin">
+            {{ form_label(form.images) }}
+            {{ form_widget(form.images) }}
+            {{ form_errors(form.images) }}
+        </div>
+
+        <div class="uk-margin">
+            {{ form_widget(form.save) }}
+        </div>
+    </fieldset>
+</section>
+
+{{ form_end(form) }}
 {% endblock %}
