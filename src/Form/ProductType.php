@@ -8,6 +8,7 @@ use App\Entity\Color;
 use App\Entity\GenderCategory;
 use App\Entity\Product;
 use App\Entity\Size;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -21,6 +22,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints\Length;
 
 class ProductType extends AbstractType
 {
@@ -41,8 +43,15 @@ class ProductType extends AbstractType
                 'label' => false,
                 'attr'  => [
                     'class'       => 'uk-input',
-                    'placeholder' => "Nom du produit"
-                ]
+                    'placeholder' => "Nom du produit (20 caractères max)",
+                    'maxlength'   => 20
+                ],
+                'constraints' => [
+                    new Length([
+                        'max' => 20,
+                        'maxMessage' => 'Le nom du produit ne peut pas dépasser 20 caractères.',
+                    ]),
+                ],
             ])
             ->add('description', TextareaType::class, [
                 'label' => false,
@@ -99,7 +108,11 @@ class ProductType extends AbstractType
                 'placeholder'  => "Catégorie",
                 'attr'         => [
                     'class' => 'uk-input',
-                ]
+                ],
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('c')
+                        ->orderBy('c.name', 'ASC'); // Tri par nom (ordre alphabétique)
+                }
             ])
             ->add('wear', ChoiceType::class, [
                 'required' => true,
