@@ -88,7 +88,11 @@ class ProductType extends AbstractType
                 'placeholder'  => "Couleur",
                 'attr'         => [
                     'class' => 'uk-input',
-                ]
+                ],
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('c')
+                        ->orderBy('c.name', 'ASC'); // Tri par nom (ordre alphabétique)
+                }
             ])
             ->add('brand', EntityType::class, [
                 'class'        => Brand::class,
