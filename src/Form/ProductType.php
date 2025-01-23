@@ -144,7 +144,7 @@ class ProductType extends AbstractType
                 'required' => false,
                 'constraints' => [
                     new File([
-                        'maxSize' => '5M',
+                        'maxSize' => '8M',
                         'mimeTypes' => ['image/jpeg', 'image/png', 'image/webp'],
                         'mimeTypesMessage' => 'Formats autorisés : JPEG, PNG, WEBP',
                     ]),
@@ -163,7 +163,7 @@ class ProductType extends AbstractType
                     new All([
                         'constraints' => [
                             new File([
-                                'maxSize' => '5M',
+                                'maxSize' => '8M',
                                 'mimeTypes' => ['image/jpeg', 'image/png', 'image/webp'],
                                 'mimeTypesMessage' => 'Formats autorisés : JPEG, PNG, WEBP',
                             ]),
