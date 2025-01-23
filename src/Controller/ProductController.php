@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\GenderCategory;
 use App\Entity\Product;
 use App\Form\ProductType;
 use App\Form\FilterProductType;
@@ -25,6 +24,9 @@ use Symfony\Component\Filesystem\Filesystem;
 #[Route('/article')]
 final class ProductController extends AbstractController
 {
+    public function __construct(private EntityManagerInterface $entityManager)
+    {}
+
     #[Route('s/{mainCategory}/{genderCategory}', name: 'product_index', methods: ['GET', 'POST'])]
     public function index(
         ProductRepository $productRepository,
@@ -96,7 +98,10 @@ final class ProductController extends AbstractController
     }
 
     #[Route('/nouveau', name: 'product_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, ImageResizer $imageResizer): Response
+    public function new(
+        Request $request,
+        ImageResizer $imageResizer
+        ): Response
     {
         if(!$this->getUser()) {
             $this->addFlash('success', 'Vous devez être connecté(e) pour ajouter un article');
@@ -130,8 +135,8 @@ final class ProductController extends AbstractController
             $product->setStock(1);
             $product->setSold(false);
 
-            $entityManager->persist($product);
-            $entityManager->flush();
+            $this->entityManager->persist($product);
+            $this->entityManager->flush();
 
             if ($this->getUser()->getIban() != null) {
                 $this->addFlash('success', 'Nouveau produit ajouté !');
@@ -162,7 +167,6 @@ final class ProductController extends AbstractController
     public function edit(
         Product $product,
         Request $request,
-        EntityManagerInterface $entityManager,
         ImageResizer $imageResizer
     ): Response {
         $form = $this->createForm(ProductType::class, $product);
@@ -219,8 +223,8 @@ final class ProductController extends AbstractController
             $product->setUser($this->getUser());
             $product->setCreatedAt(new \DateTimeImmutable());
 
-            $entityManager->persist($product);
-            $entityManager->flush();
+            $this->entityManager->persist($product);
+            $this->entityManager->flush();
 
             if ($this->getUser()->getIban() != null) {
                 $this->addFlash('success', 'Produit modifié !');
@@ -241,7 +245,6 @@ final class ProductController extends AbstractController
     public function delete(
         Request $request,
         Product $product,
-        EntityManagerInterface $entityManager,
         Filesystem $filesystem
     ): Response {
         // Suppression des images associées au produit
@@ -256,11 +259,14 @@ final class ProductController extends AbstractController
         }
 
         if ($this->isCsrfTokenValid('delete' . $product->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($product);
-            $entityManager->flush();
+            $this->entityManager->remove($product);
+            $this->entityManager->flush();
         }
 
+        $this->addFlash('success', 'Article supprimé !');
+
         return $this->redirectToRoute('product_index', [
+            'mainCategory'   => 'vetements',
             'genderCategory' => 'tout'
         ], Response::HTTP_SEE_OTHER);
     }
