@@ -8,6 +8,7 @@ use App\Entity\Brand;
 use App\Entity\Color;
 use App\Entity\GenderCategory;
 use App\Entity\MainCategory;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -52,7 +53,11 @@ class FilterProductType extends AbstractType
             'placeholder' => 'Choisir une catégorie',
             'attr'         => [
                 'class' => 'uk-input',
-            ]
+            ],
+            'query_builder' => function (EntityRepository $er) {
+                return $er->createQueryBuilder('c')
+                    ->orderBy('c.name', 'ASC'); // Tri par nom (ordre alphabétique)
+            }
         ]);
 
         // Taille
@@ -76,7 +81,11 @@ class FilterProductType extends AbstractType
             'placeholder' => 'Choisir une marque',
             'attr'         => [
                 'class' => 'uk-input',
-            ]
+            ],
+            'query_builder' => function (EntityRepository $er) {
+                return $er->createQueryBuilder('c')
+                    ->orderBy('c.name', 'ASC'); // Tri par nom (ordre alphabétique)
+            }
         ]);
 
         // Couleur
@@ -88,7 +97,11 @@ class FilterProductType extends AbstractType
             'placeholder' => 'Choisir une couleur',
             'attr'         => [
                 'class' => 'uk-input',
-            ]
+            ],
+            'query_builder' => function (EntityRepository $er) {
+                return $er->createQueryBuilder('c')
+                    ->orderBy('c.name', 'ASC'); // Tri par nom (ordre alphabétique)
+            }
         ]);
 
         // Submit button
