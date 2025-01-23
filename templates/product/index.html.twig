@@ -54,11 +54,13 @@
         uk-scrollspy="cls: uk-animation-slide-bottom; target: .uk-card; delay: 150; repeat: false">
         {% for product in products %}
         <div style="margin: 20px;">
+            {% if product.sold != 1 %}
+            
             <div class="uk-card uk-card-default" style="width: 320px; height: 480px;">
                 <div class="uk-card-media-top uk-flex uk-flex-center uk-flex-middle"
-                    style="width: 100%; height: 200px; overflow: hidden;">
-                    {% if product.mainImage is not empty %}
-                    <img src="{{ asset('uploads/images/' ~ product.mainImage) }}"
+                style="width: 100%; height: 200px; overflow: hidden;">
+                {% if product.mainImage is not empty %}
+                <img src="{{ asset('uploads/images/' ~ product.mainImage) }}"
                         style="width: 100%; height: 100%; object-fit: cover;" alt="">
                     {% endif %}
                 </div>
@@ -67,13 +69,18 @@
                     <p class="uk-text-meta uk-margin-remove-top">{{ product.size }} - {{ product.wear }} - {{
                         product.color }} - {{ product.brand }}
                     </p>
-                    <a class="uk-link-muted" href="{{ path('product_user_index', {'userId': product.user.id}) }}"><span
-                            uk-icon="star"></span> {{ product.user.pseudo }}</a>
-                    <br>
-                    <br>
-                    <a class="uk-button uk-button-default" href="{{ path('product_show', {id: product.id}) }}">Voir</a>
+                    <div class="uk-flex uk-flex-between uk-flex-middle">
+                        <a class="uk-link-muted" href="{{ path('product_user_index', {'userId': product.user.id}) }}">
+                            <span uk-icon="star"></span> {{ product.user.pseudo }}
+                        </a>
+                        <span class="uk-text-bold">{{ product.price }} €</span>
+                    </div>
+
+                        <br><br>
+                        <a class="uk-button uk-button-default" href="{{ path('product_show', {id: product.id}) }}">Voir</a>
+                    </div>
                 </div>
-            </div>
+            {% endif %}
         </div>
         {% endfor %}
 
