@@ -29,8 +29,7 @@
                                             </li>
                                             <li>
                                                 <a href="{{ path('product_index', {mainCategory:"vetements", genderCategory: "tout"}) }}">Voir tout</a>
-                                            </li>
-                                            
+                                            </li>                                   
                                         </ul>
                                     </div>
                                     <div>
@@ -61,6 +60,9 @@
                                 </div>
                             </div>
                         </li>
+
+                        {# Vendre #}
+                        <li><a href="{{ path('product_new') }}">Vendre</a></li>
 
                         {# UTILISATEUR #}
                         <li>
@@ -133,3 +135,13 @@
         </div>
     </nav>
 </div>
+<nav class="uk-navbar-container uk-navbar" uk-navbar>
+    <div class="uk-navbar-center">
+        <div class="uk-navbar-item">
+            <form class="uk-search uk-search-navbar">
+                <span uk-search-icon></span>
+                <input class="uk-search-input" type="search" placeholder="Rechercher" aria-label="Search">
+            </form>
+        </div>
+    </div>
+</nav>
