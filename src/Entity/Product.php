@@ -67,6 +67,9 @@ class Product
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $mainImage = null;
 
+    #[ORM\ManyToOne(inversedBy: 'product')]
+    private ?Cart $cart = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -277,6 +280,18 @@ class Product
     public function setMainImage(?string $mainImage): static
     {
         $this->mainImage = $mainImage;
+
+        return $this;
+    }
+
+    public function getCart(): ?Cart
+    {
+        return $this->cart;
+    }
+
+    public function setCart(?Cart $cart): static
+    {
+        $this->cart = $cart;
 
         return $this;
     }
