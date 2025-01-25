@@ -24,10 +24,10 @@ use Symfony\Component\Filesystem\Filesystem;
 #[Route('/article')]
 final class ProductController extends AbstractController
 {
-    public function __construct(private EntityManagerInterface $entityManager)
-    {}
+    public function __construct(private EntityManagerInterface $entityManager) {}
 
     #[Route('s/{mainCategory}/{genderCategory}', name: 'product_index', methods: ['GET', 'POST'])]
+    #[Route('/recherche', name: 'product_search', methods: ['GET', 'POST'])]
     public function index(
         ProductRepository $productRepository,
         CategoryRepository $categoryRepository,
@@ -38,10 +38,10 @@ final class ProductController extends AbstractController
         GenderCategoryRepository $genderCategoryRepository,
         PaginatorInterface $paginator,
         Request $request,
-        string $mainCategory,
-        string $genderCategory
-        ): Response
-    {
+        string $mainCategory = 'tout',
+        string $genderCategory = 'tout'
+    ): Response {
+
         $form = $this->createForm(FilterProductType::class, null, [
             'categories'       => $categoryRepository->findAll(),
             'sizes'            => $sizeRepository->findAll(),
@@ -53,28 +53,39 @@ final class ProductController extends AbstractController
 
         $form->handleRequest($request);
 
+        // Récupérer le mot-clé de la recherche (si il existe)
+        $keyword = $request->query->get('q', '');
+
+        // Filtrer d'abord les produits avec les critères de formulaire
         if ($form->isSubmitted() && $form->isValid()) {
-            // Si le formulaire est soumis et valide, on récupère les données directement
-            $data = $form->getData();  // Données du formulaire
+            $data = $form->getData(); // Données du formulaire
             $products = $productRepository->findFilteredProducts($data);
         } else {
-            // Sinon, filtrage selon la catégorie principale et la catégorie de genre
-            if ($mainCategory) {
+            // Filtrage selon la catégorie principale et la catégorie de genre
+            if ($mainCategory !== 'tout') {
                 if ($genderCategory === 'tout') {
                     $products = $productRepository->findByMainCategory($mainCategory);
                 } else {
                     $products = $productRepository->findByMainCategoryAndGender($mainCategory, $genderCategory);
                 }
             } else {
-                // Gérer le cas où aucune catégorie principale n'est sélectionnée
+                // Si aucune catégorie principale n'est sélectionnée, récupérer tous les produits
                 $products = $productRepository->findRandomAllProducts();
             }
+        }
+
+        // Si un mot-clé est spécifié, filtrer les produits par le mot-clé
+        if ($keyword) {
+            $products = array_filter($products, function ($product) use ($keyword) {
+                return stripos($product->getName(), $keyword) !== false; // Chercher dans le nom du produit
+            });
         }
 
         // Pagination avec limite de 21 articles par page
         $pagination = $paginator->paginate(
             $products,
-            $request->query->getInt('page', 1), 21
+            $request->query->getInt('page', 1),
+            21
         );
 
         return $this->render('product/index.html.twig', [
@@ -88,8 +99,7 @@ final class ProductController extends AbstractController
     public function userProducts(
         ProductRepository $productRepository,
         string $userId
-        ): Response
-    {
+    ): Response {
         $products = $productRepository->findByUserId($userId);
 
         return $this->render('product/index.html.twig', [
@@ -101,9 +111,8 @@ final class ProductController extends AbstractController
     public function new(
         Request $request,
         ImageResizer $imageResizer
-        ): Response
-    {
-        if(!$this->getUser()) {
+    ): Response {
+        if (!$this->getUser()) {
             $this->addFlash('success', 'Vous devez être connecté(e) pour ajouter un article');
             return $this->redirectToRoute('product_index');
         }
@@ -116,7 +125,7 @@ final class ProductController extends AbstractController
             $mainImage = $form->get('mainImage')->getData();
             $mainImagePath = null;
 
-            if($mainImage) {
+            if ($mainImage) {
                 $mainImagePath = $imageResizer->resize($mainImage, $this->getParameter('images_directory'));
             }
 
@@ -175,7 +184,7 @@ final class ProductController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $mainImage = $form->get('mainImage')->getData();
             $oldMainImage = $product->getMainImage();
-            
+
             if ($mainImage) {
                 // Supprimer l'ancienne image principale si elle existe
                 if ($oldMainImage) {
@@ -184,7 +193,7 @@ final class ProductController extends AbstractController
                         unlink($oldMainImagePath);
                     }
                 }
-    
+
                 // Ajouter la nouvelle image principale
                 $mainImagePath = $imageResizer->resize($mainImage, $this->getParameter('images_directory'));
                 $product->setMainImage($mainImagePath);

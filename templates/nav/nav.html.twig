@@ -62,7 +62,15 @@
                         </li>
 
                         {# Vendre #}
+                        {% if app.user %}
+                        
                         <li><a href="{{ path('product_new') }}">Vendre</a></li>
+                        
+                        {% else %}
+                        
+                        <li><a href="{{ path('login') }}">Vendre</a></li>
+                        
+                        {% endif %}
 
                         {# UTILISATEUR #}
                         <li>
@@ -135,12 +143,14 @@
         </div>
     </nav>
 </div>
+
+{# Barre de recherche #}
 <nav class="uk-navbar-container uk-navbar" uk-navbar>
     <div class="uk-navbar-center">
         <div class="uk-navbar-item">
-            <form class="uk-search uk-search-navbar">
+            <form class="uk-search uk-search-navbar" method="GET" action="{{ path('product_search') }}">
                 <span uk-search-icon></span>
-                <input class="uk-search-input" type="search" placeholder="Rechercher" aria-label="Search">
+                <input class="uk-search-input" type="search" name="q" placeholder="Rechercher" aria-label="Search" value="{{ app.request.query.get('q') }}">
             </form>
         </div>
     </div>

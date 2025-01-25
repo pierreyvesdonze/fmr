@@ -78,43 +78,58 @@ class ProductRepository extends ServiceEntityRepository
     public function findFilteredProducts(array $filters)
     {
         $qb = $this->createQueryBuilder('p')
-                   ->leftJoin('p.category', 'c')
-                   ->leftJoin('p.size', 's')
-                   ->leftJoin('p.brand', 'b')
-                   ->leftJoin('p.color', 'co')
-                   ->leftJoin('c.mainCategory', 'mc')
-                   ->leftJoin('p.genderCategory', 'g');
+            ->leftJoin('p.category', 'c')
+            ->leftJoin('p.size', 's')
+            ->leftJoin('p.brand', 'b')
+            ->leftJoin('p.color', 'co')
+            ->leftJoin('c.mainCategory', 'mc')
+            ->leftJoin('p.genderCategory', 'g');
 
         if (!empty($filters['category'])) {
             $qb->andWhere('c.id = :category')
-               ->setParameter('category', $filters['category']);
+                ->setParameter('category', $filters['category']);
         }
 
         if (!empty($filters['size'])) {
             $qb->andWhere('s.id = :size')
-               ->setParameter('size', $filters['size']);
+                ->setParameter('size', $filters['size']);
         }
 
         if (!empty($filters['brand'])) {
             $qb->andWhere('b.id = :brand')
-               ->setParameter('brand', $filters['brand']);
+                ->setParameter('brand', $filters['brand']);
         }
 
         if (!empty($filters['color'])) {
             $qb->andWhere('co.id = :color')
-               ->setParameter('color', $filters['color']);
+                ->setParameter('color', $filters['color']);
         }
 
         if (!empty($filters['mainCategory'])) {
             $qb->andWhere('mc.id = :mainCategory')
-               ->setParameter('mainCategory', $filters['mainCategory']);
+                ->setParameter('mainCategory', $filters['mainCategory']);
         }
 
         if (!empty($filters['genderCategory'])) {
             $qb->andWhere('g.id = :genderCategory')
-               ->setParameter('genderCategory', $filters['genderCategory']);
+                ->setParameter('genderCategory', $filters['genderCategory']);
         }
 
         return $qb->getQuery()->getResult();
+    }
+
+    public function searchByKeyword(string $keyword)
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.name LIKE :keyword')
+            ->orWhere('p.description LIKE :keyword')
+            ->orWhere('p.wear LIKE :keyword')
+            ->orWhere('b.name LIKE :keyword')
+            ->orWhere('c.name LIKE :keyword')
+            ->leftJoin('p.brand', 'b')
+            ->leftJoin('p.color', 'c')
+            ->setParameter('keyword', '%' . $keyword . '%')
+            ->getQuery()
+            ->getResult();
     }
 }
