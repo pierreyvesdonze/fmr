@@ -25,7 +25,8 @@ use Symfony\Component\Filesystem\Filesystem;
 final class ProductController extends AbstractController
 {
     public function __construct(private EntityManagerInterface $entityManager) {}
-
+    
+    #[Route('s/utilisateur/{userId}', name: 'product_user_index', methods: ['GET'])]
     #[Route('s/{mainCategory}/{genderCategory}', name: 'product_index', methods: ['GET', 'POST'])]
     #[Route('/recherche', name: 'product_search', methods: ['GET', 'POST'])]
     public function index(
@@ -39,7 +40,8 @@ final class ProductController extends AbstractController
         PaginatorInterface $paginator,
         Request $request,
         string $mainCategory = 'tout',
-        string $genderCategory = 'tout'
+        string $genderCategory = 'tout',
+        ?int $userId = null
     ): Response {
 
         $form = $this->createForm(FilterProductType::class, null, [
@@ -56,12 +58,12 @@ final class ProductController extends AbstractController
         // Récupérer le mot-clé de la recherche (si il existe)
         $keyword = $request->query->get('q', '');
 
-        // Filtrer d'abord les produits avec les critères de formulaire
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData(); // Données du formulaire
+        if ($userId !== null) {
+            $products = $productRepository->findByUserId($userId);
+        } elseif ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
             $products = $productRepository->findFilteredProducts($data);
         } else {
-            // Filtrage selon la catégorie principale et la catégorie de genre
             if ($mainCategory !== 'tout') {
                 if ($genderCategory === 'tout') {
                     $products = $productRepository->findByMainCategory($mainCategory);
@@ -69,7 +71,6 @@ final class ProductController extends AbstractController
                     $products = $productRepository->findByMainCategoryAndGender($mainCategory, $genderCategory);
                 }
             } else {
-                // Si aucune catégorie principale n'est sélectionnée, récupérer tous les produits
                 $products = $productRepository->findRandomAllProducts();
             }
         }
@@ -94,18 +95,6 @@ final class ProductController extends AbstractController
             'products'       => $pagination,
             'genderCategory' => $genderCategory,
             'form'           => $form->createView()
-        ]);
-    }
-
-    #[Route('s/utilisateur/{userId}', name: 'product_user_index', methods: ['GET'])]
-    public function userProducts(
-        ProductRepository $productRepository,
-        string $userId
-    ): Response {
-        $products = $productRepository->findByUserId($userId);
-
-        return $this->render('product/index.html.twig', [
-            'products' => $products
         ]);
     }
 
