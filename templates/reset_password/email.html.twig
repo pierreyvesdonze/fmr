@@ -2,8 +2,6 @@
 
 <p>Pour réinitialiser votre email cliquez sur le lien ci-dessous</p>
 
-<a href="{{ url('app_reset_password', {token: resetToken.token}) }}">{{ url('app_reset_password', {token: resetToken.token}) }}</a>
-
-<p>Ce lien expire dans : {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.</p>
+<a href="{{ url('reset_password', {token: resetToken.token}) }}">{{ url('reset_password', {token: resetToken.token}) }}</a>
 
 <p>À très vite.</p>
