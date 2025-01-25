@@ -28,8 +28,7 @@ class ResetPasswordController extends AbstractController
     public function __construct(
         private ResetPasswordHelperInterface $resetPasswordHelper,
         private EntityManagerInterface $entityManager
-    ) {
-    }
+    ) {}
 
     /**
      * Display & process form to request a password reset.
@@ -59,7 +58,20 @@ class ResetPasswordController extends AbstractController
     #[Route('/check-email', name: 'check_email')]
     public function checkEmail(): Response
     {
-        return $this->render('reset_password/check_email.html.twig');
+        // Générer un faux token si l'utilisateur n'existe pas ou si quelqu'un accède directement à cette page.
+        // Cela empêche de dévoiler si un utilisateur a été trouvé avec l'email donné ou non.
+        $resetToken = $this->getTokenObjectFromSession();
+
+        if (null === $resetToken) {
+            // Si aucun token n'est trouvé dans la session, créer un token factice pour éviter les fuites d'information.
+            $resetToken = $this->resetPasswordHelper->generateFakeResetToken();
+        }
+
+        return $this->render('reset_password/check_email.html.twig', [
+            'resetToken' => $resetToken, // Simple token string
+            'expirationMessageKey' => 'expiration_time', // Clé d'expiration fictive
+            'expirationMessageData' => '24 hours', // Durée fictive
+        ]);
     }
 
     /**
@@ -136,8 +148,7 @@ class ResetPasswordController extends AbstractController
             ->htmlTemplate('reset_password/email.html.twig')
             ->context([
                 'resetToken' => $resetToken,
-            ])
-        ;
+            ]);
 
         $mailer->send($email);
 
