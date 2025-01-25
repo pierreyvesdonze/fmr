@@ -24,7 +24,7 @@ class FilterProductType extends AbstractType
             'choice_label' => function ($genderCategory) {
                 return ucfirst($genderCategory->getName());
             },
-            'required'     => true,
+            'required'     => false,
             'label'        => false,
             'placeholder'  => "Pour qui ?",
             'attr'         => [
