@@ -74,10 +74,12 @@ final class ProductController extends AbstractController
             }
         }
 
-        // Si un mot-clé est spécifié, filtrer les produits par le mot-clé
         if ($keyword) {
+            // Recherche par nom ou catégorie
             $products = array_filter($products, function ($product) use ($keyword) {
-                return stripos($product->getName(), $keyword) !== false; // Chercher dans le nom du produit
+                // Recherche dans le nom du produit et dans la catégorie
+                return stripos($product->getName(), $keyword) !== false || 
+                       stripos($product->getCategory()->getName(), $keyword) !== false; // Chercher dans le nom et la catégorie
             });
         }
 
