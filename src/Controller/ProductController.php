@@ -78,13 +78,13 @@ final class ProductController extends AbstractController
         if ($keyword) {
             // Recherche par nom, catégorie, marque, couleur, etc.
             $products = array_filter($products, function ($product) use ($keyword) {
-                // Recherche dans le nom du produit, dans la catégorie, la marque, la couleur et la taille
                 return stripos($product->getName(), $keyword) !== false ||
-                       stripos($product->getCategory()->getName(), $keyword) !== false ||
-                       stripos($product->getBrand()->getName(), $keyword) !== false || // Recherche dans la marque
-                       stripos($product->getColor()->getName(), $keyword) !== false || // Recherche dans la couleur
-                       stripos($product->getSize()->getName(), $keyword) !== false; // Recherche dans la taille
+                       stripos($product->getCategory()?->getName(), $keyword) !== false ||
+                       stripos($product->getBrand()?->getName(), $keyword) !== false || // Recherche dans la marque (évite null)
+                       stripos($product->getColor()?->getName(), $keyword) !== false || // Recherche dans la couleur
+                       stripos($product->getSize()?->getName(), $keyword) !== false;    // Recherche dans la taille
             });
+            
         }
 
         // Pagination avec limite de 21 articles par page
