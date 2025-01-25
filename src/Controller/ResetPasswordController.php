@@ -158,7 +158,7 @@ class ResetPasswordController extends AbstractController
         }
 
         $email = (new TemplatedEmail())
-            ->from(new Address('pyd3.14@gmail.com', 'Admin Mail'))
+            ->from(new Address('contact@fmr.pydonze.fr', 'Admin Mail'))
             ->to($user->getEmail())
             ->subject('Réinitialiser votre mot de passe')
             ->htmlTemplate('reset_password/email.html.twig')
