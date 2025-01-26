@@ -72,9 +72,11 @@
                 </div>
                 <div class="uk-card-body">
                     <h3 class="uk-card-title">{{ product.name }}</h3>
-                    <p class="uk-text-meta uk-margin-remove-top">{{ product.size }} - {{ product.wear }} - {{
-                        product.color }} - {{ product.brand }}
-                    </p>
+                    <div style="height: 75px;">
+                        <p class="uk-text-meta uk-margin-remove-top">{{ product.size }} - {{ product.wear }} - {{
+                            product.color }} - {{ product.brand }}
+                        </p>
+                    </div>
                     <div class="uk-flex uk-flex-between uk-flex-middle">
                         <a class="uk-link-muted" href="{{ path('product_user_index', {'userId': product.user.id}) }}">
                             <span uk-icon="star"></span> {{ product.user.pseudo }}
