@@ -78,7 +78,7 @@ PAGINATOR
 
 /*
  ***************************
-ALERT / FLASH MESSAGE
+ALERT / FLASH MESSAGE / MODAL
  ***************************
  */
 .flash-container {
@@ -94,16 +94,8 @@ ALERT / FLASH MESSAGE
     border: none;
     text-align: center;
     z-index: 1200;
-    font-size: 2.5em;
+    font-size: 1.2em;
     font-weight: 400;
-
-    @include xs {
-        font-size: 1.8em;
-    }
-
-    @include sm {
-        font-size: 1.8em;
-    }
 }
 
 .alert-success {
@@ -114,3 +106,25 @@ ALERT / FLASH MESSAGE
     color: var(--flash-alert-error);
 }
 
+.modal-delete-confirm {
+    display: none; /* Modale cachée par défaut */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.modal-delete-confirm button {
+    margin-top: 10px;
+}

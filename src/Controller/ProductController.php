@@ -84,7 +84,6 @@ final class ProductController extends AbstractController
                        stripos($product->getColor()?->getName(), $keyword) !== false || // Recherche dans la couleur
                        stripos($product->getSize()?->getName(), $keyword) !== false;    // Recherche dans la taille
             });
-            
         }
 
         // Pagination avec limite de 21 articles par page
