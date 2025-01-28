@@ -74,7 +74,7 @@
                     <br>
                     <br>
 
-                    {% if app.user == product.user %}
+                    {% if app.user == product.user or is_granted('ROLE_ADMIN') %}
                     <a class="uk-button uk-button-default"
                         href="{{ path('product_edit', {'id': product.id}) }}">Modifier</a>
                     <br>
@@ -86,6 +86,5 @@
             </div>
         </div>
     </div>
-
 </div>
 {% endblock %}
