@@ -3,55 +3,55 @@ document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('filterForm');
     const spinner = document.querySelector('.spinner');
 
-    if (form) {
-        const filterButton = form.querySelector('button[type="submit"]');
+    if (!form || !resetButton) return;
 
-        // Fonction pour vérifier si un filtre est sélectionné
-        function checkFilters() {
-            let isActive = false;
-            const inputs = form.querySelectorAll('input, select');
+    const filterButton = form.querySelector('button[type="submit"]');
 
-            inputs.forEach(input => {
-                if ((input.type === 'checkbox' || input.type === 'radio') && input.checked) {
-                    isActive = true;
-                } else if (input.value.trim() !== '') {
-                    isActive = true;
-                }
-            });
+    // Vérifie si un filtre est actif
+    function checkFilters() {
+        let isActive = false;
+        const inputs = form.querySelectorAll('input, select');
 
-            // Active ou désactive le bouton selon si un filtre est sélectionné
-            filterButton.disabled = !isActive;
-        }
-
-        // Désactive le bouton "Filtrer" dès le chargement de la page si aucun filtre n'est sélectionné
-        checkFilters();
-
-        // Ajoute un écouteur d'événements sur les champs du formulaire
-        form.querySelectorAll('input, select').forEach(input => {
-            input.addEventListener('change', checkFilters);  // Met à jour quand un filtre est modifié
+        inputs.forEach(input => {
+            if ((input.type === 'checkbox' || input.type === 'radio') && input.checked) {
+                isActive = true;
+            } else if (input.value && input.value.trim() !== '') {
+                isActive = true;
+            }
         });
 
-        // Réinitialise les filtres et désactive le bouton
-        if (resetButton) {
-            resetButton.addEventListener('click', function (event) {
-                event.preventDefault();
-
-                // Afficher le spinner lors de la réinitialisation
-                if (spinner) {
-                    spinner.style.display = 'block'; // Affiche le spinner
-                }
-
-                // Réinitialiser les champs du formulaire
-                form.reset();
-
-                checkFilters();  // Vérifie si le bouton doit être activé ou non
-
-                setTimeout(() => {
-                    if (spinner) {
-                        spinner.style.display = 'none'; // Cache le spinner après réinitialisation
-                    }
-                }, 500);
-            });
-        }
+        filterButton.disabled = !isActive;
     }
+
+    checkFilters();
+
+    form.querySelectorAll('input, select').forEach(input => {
+        input.addEventListener('change', checkFilters);
+    });
+
+    // Réinitialisation des filtres
+    resetButton.addEventListener('click', function (event) {
+        event.preventDefault();
+
+        if (spinner) spinner.style.display = 'block';
+
+        // Réinitialiser les inputs et selects
+        form.querySelectorAll('input').forEach(input => {
+            if (input.type === 'checkbox' || input.type === 'radio') {
+                input.checked = false;
+            } else {
+                input.value = '';
+            }
+        });
+
+        form.querySelectorAll('select').forEach(select => {
+            select.selectedIndex = 0; // Remet au placeholder / première option
+        });
+
+        checkFilters();
+
+        setTimeout(() => {
+            if (spinner) spinner.style.display = 'none';
+        }, 500);
+    });
 });
