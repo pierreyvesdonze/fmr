@@ -56,47 +56,33 @@ final class ProductController extends AbstractController
 
         $form->handleRequest($request);
 
-        // Récupérer le mot-clé de la recherche (si il existe)
         $keyword = $request->query->get('q', '');
+
+        // Initialisation des filtres
+        $mainCategorySlug = null;
+        $genderCategorySlug = null;
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            $mainCategorySlug = $data['mainCategory'] instanceof MainCategory ? $data['mainCategory']->getSlug() : null;
+            $genderCategorySlug = is_string($data['genderCategory']) ? $data['genderCategory'] : null;
+        } else {
+            $mainCategorySlug = $mainCategory !== 'tout' ? $mainCategory : null;
+            $genderCategorySlug = $genderCategory !== 'tout' ? $genderCategory : null;
+        }
 
         if ($userId !== null) {
             $products = $productRepository->findByUserId($userId);
-        } elseif ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-
-            $mainCategorySlug = null;
-            if ($data['mainCategory'] instanceof MainCategory) {
-                $mainCategorySlug = $data['mainCategory']->getSlug();
-            }
-
-            $genderCategorySlug = $data['genderCategory'] ?? null;
-
-            if ($mainCategorySlug && $genderCategorySlug) {
-                $products = $productRepository->findByMainCategoryAndGender($mainCategorySlug, $genderCategorySlug);
-            } elseif ($mainCategorySlug) {
-                $products = $productRepository->findByMainCategory($mainCategorySlug);
-            } elseif ($genderCategorySlug) {
-                $products = $productRepository->findByGenderCategory($genderCategorySlug);
-            } else {
-                $products = $productRepository->findRandomAllProducts();
-            }
+        } elseif ($mainCategorySlug && $genderCategorySlug) {
+            $products = $productRepository->findByMainCategoryAndGender($mainCategorySlug, $genderCategorySlug);
+        } elseif ($mainCategorySlug) {
+            $products = $productRepository->findByMainCategory($mainCategorySlug);
+        } elseif ($genderCategorySlug) {
+            $products = $productRepository->findByGenderCategory($genderCategorySlug);
         } else {
-            // Cas où le formulaire n'est pas soumis
-            $mainCategorySlug = $data['mainCategory'] ?? null;
-            $genderCategorySlug = $data['genderCategory'] ?? null;
-
-            if ($mainCategorySlug && $genderCategorySlug) {
-                $products = $productRepository->findByMainCategoryAndGender($mainCategorySlug, $genderCategorySlug);
-            } elseif ($mainCategorySlug) {
-                $products = $productRepository->findByMainCategory($mainCategorySlug);
-            } elseif ($genderCategorySlug) {
-                $products = $productRepository->findByGenderCategory($genderCategorySlug);
-            } else {
-                $products = $productRepository->findRandomAllProducts();
-            }
+            $products = $productRepository->findRandomAllProducts();
         }
 
-        // Filtrage par mot-clé si nécessaire
         if ($keyword) {
             $products = array_filter($products, function ($product) use ($keyword) {
                 return stripos($product->getName(), $keyword) !== false ||
@@ -107,7 +93,6 @@ final class ProductController extends AbstractController
             });
         }
 
-        // Pagination avec limite de 21 articles par page
         $pagination = $paginator->paginate(
             $products,
             $request->query->getInt('page', 1),
@@ -120,7 +105,6 @@ final class ProductController extends AbstractController
             'form'           => $form->createView()
         ]);
     }
-
 
     #[Route('/nouveau', name: 'product_new', methods: ['GET', 'POST'])]
     public function new(
