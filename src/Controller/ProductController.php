@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\MainCategory;
 use App\Entity\Product;
 use App\Form\ProductType;
 use App\Form\FilterProductType;
@@ -25,7 +26,7 @@ use Symfony\Component\Filesystem\Filesystem;
 final class ProductController extends AbstractController
 {
     public function __construct(private EntityManagerInterface $entityManager) {}
-    
+
     #[Route('s/utilisateur/{userId}', name: 'product_user_index', methods: ['GET'])]
     #[Route('s/{mainCategory}/{genderCategory}', name: 'product_index', methods: ['GET', 'POST'])]
     #[Route('/recherche', name: 'product_search', methods: ['GET', 'POST'])]
@@ -62,27 +63,47 @@ final class ProductController extends AbstractController
             $products = $productRepository->findByUserId($userId);
         } elseif ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            $products = $productRepository->findFilteredProducts($data);
+
+            $mainCategorySlug = null;
+            if ($data['mainCategory'] instanceof MainCategory) {
+                $mainCategorySlug = $data['mainCategory']->getSlug();
+            }
+
+            $genderCategorySlug = $data['genderCategory'] ?? null;
+
+            if ($mainCategorySlug && $genderCategorySlug) {
+                $products = $productRepository->findByMainCategoryAndGender($mainCategorySlug, $genderCategorySlug);
+            } elseif ($mainCategorySlug) {
+                $products = $productRepository->findByMainCategory($mainCategorySlug);
+            } elseif ($genderCategorySlug) {
+                $products = $productRepository->findByGenderCategory($genderCategorySlug);
+            } else {
+                $products = $productRepository->findRandomAllProducts();
+            }
         } else {
-            if ($mainCategory !== 'tout') {
-                if ($genderCategory === 'tout') {
-                    $products = $productRepository->findByMainCategory($mainCategory);
-                } else {
-                    $products = $productRepository->findByMainCategoryAndGender($mainCategory, $genderCategory);
-                }
+            // Cas où le formulaire n'est pas soumis
+            $mainCategorySlug = $data['mainCategory'] ?? null;
+            $genderCategorySlug = $data['genderCategory'] ?? null;
+
+            if ($mainCategorySlug && $genderCategorySlug) {
+                $products = $productRepository->findByMainCategoryAndGender($mainCategorySlug, $genderCategorySlug);
+            } elseif ($mainCategorySlug) {
+                $products = $productRepository->findByMainCategory($mainCategorySlug);
+            } elseif ($genderCategorySlug) {
+                $products = $productRepository->findByGenderCategory($genderCategorySlug);
             } else {
                 $products = $productRepository->findRandomAllProducts();
             }
         }
 
+        // Filtrage par mot-clé si nécessaire
         if ($keyword) {
-            // Recherche par nom, catégorie, marque, couleur, etc.
             $products = array_filter($products, function ($product) use ($keyword) {
                 return stripos($product->getName(), $keyword) !== false ||
-                       stripos($product->getCategory()?->getName(), $keyword) !== false ||
-                       stripos($product->getBrand()?->getName(), $keyword) !== false || // Recherche dans la marque (évite null)
-                       stripos($product->getColor()?->getName(), $keyword) !== false || // Recherche dans la couleur
-                       stripos($product->getSize()?->getName(), $keyword) !== false;    // Recherche dans la taille
+                    stripos($product->getCategory()?->getName(), $keyword) !== false ||
+                    stripos($product->getBrand()?->getName(), $keyword) !== false ||
+                    stripos($product->getColor()?->getName(), $keyword) !== false ||
+                    stripos($product->getSize()?->getName(), $keyword) !== false;
             });
         }
 
@@ -99,6 +120,7 @@ final class ProductController extends AbstractController
             'form'           => $form->createView()
         ]);
     }
+
 
     #[Route('/nouveau', name: 'product_new', methods: ['GET', 'POST'])]
     public function new(

@@ -6,6 +6,7 @@ use App\Entity\Brand;
 use App\Entity\Category;
 use App\Entity\Color;
 use App\Entity\GenderCategory;
+use App\Entity\MainCategory;
 use App\Entity\Product;
 use App\Entity\Size;
 use Doctrine\ORM\EntityRepository;
@@ -23,27 +24,43 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ProductType extends AbstractType
 {
+    public function __construct(private TranslatorInterface $translator) {}
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('genderCategory', EntityType::class, [
                 'class'        => GenderCategory::class,
-                'choice_label' => 'name',
+                'choice_label' => function ($gender) {
+                    return 'gender.' . strtolower($gender->getName()); // ex: gender.men, gender.women
+                },
+                'choice_translation_domain' => 'messages', 
                 'required'     => true,
                 'label'        => false,
-                'placeholder'  => "Pour qui ?",
+                'placeholder'  => $this->translator->trans('filter.gender', [], 'messages'),
                 'attr'         => [
                     'class' => 'uk-input',
                 ]
             ])
+            ->add('mainCategory', EntityType::class, [
+                'class' => MainCategory::class,
+                'choice_label' => 'name',
+                'required'     => false,
+                'label'        => false,
+                'placeholder'  => $this->translator->trans('filter.mainCategory', [], 'messages'),
+                'attr'         => ['class' => 'uk-input'],
+                'mapped'       => false, // <-- hyper important
+            ])
+
             ->add('name', TextType::class, [
                 'label' => false,
                 'attr'  => [
                     'class'       => 'uk-input',
-                    'placeholder' => "Nom du produit (20 caractères max)",
+                    'placeholder'  => $this->translator->trans('product_form.name', [], 'messages'),
                     'maxlength'   => 20
                 ],
                 'constraints' => [
@@ -57,7 +74,7 @@ class ProductType extends AbstractType
                 'label' => false,
                 'attr' => [
                     'class'       => 'uk-input',
-                    'placeholder' => "Description du produit"
+                    'placeholder'  => $this->translator->trans('product_form.description', [], 'messages'),
                 ]
             ])
             ->add('price', NumberType::class, [
@@ -66,7 +83,7 @@ class ProductType extends AbstractType
                 'html5' => true,
                 'attr' => [
                     'class'       => 'uk-input',
-                    'placeholder' => "Prix en €",
+                    'placeholder'  => $this->translator->trans('product_form.price', [], 'messages'),
                     'step'        => '0.01'
                 ]
             ])
@@ -75,7 +92,7 @@ class ProductType extends AbstractType
                 'choice_label' => 'name',
                 'required'     => true,
                 'label'        => false,
-                'placeholder'  => "Taille",
+                'placeholder'  => $this->translator->trans('product_form.size', [], 'messages'),
                 'attr'         => [
                     'class' => 'uk-input',
                 ]
@@ -85,7 +102,7 @@ class ProductType extends AbstractType
                 'choice_label' => 'name',
                 'required'     => true,
                 'label'        => false,
-                'placeholder'  => "Couleur",
+                'placeholder'  => $this->translator->trans('color.choose', [], 'messages'),
                 'attr'         => [
                     'class' => 'uk-input',
                 ],
@@ -99,7 +116,7 @@ class ProductType extends AbstractType
                 'choice_label' => 'name',
                 'required'     => false,
                 'label'        => false,
-                'placeholder'  => "Marque (optionnel)",
+                'placeholder'  => $this->translator->trans('filter.brand', [], 'messages'),
                 'attr'         => [
                     'class' => 'uk-input',
                 ],
@@ -113,7 +130,7 @@ class ProductType extends AbstractType
                 'choice_label' => 'name',
                 'required'     => true,
                 'label'        => false,
-                'placeholder'  => "Catégorie",
+                'placeholder'  => $this->translator->trans('filter.category', [], 'messages'),
                 'attr'         => [
                     'class' => 'uk-input',
                 ],
@@ -138,20 +155,21 @@ class ProductType extends AbstractType
                 },
             ])
             ->add('mainImage', FileType::class, [
-                'label' => 'Image principale',
+                'label' => 'Image principale (2MO max)',
                 'multiple' => false,
                 'mapped' => false,
                 'required' => false,
                 'constraints' => [
                     new File([
-                        'maxSize' => '8M',
+                        'maxSize' => '20M',
+                        'maxSizeMessage' => 'Le fichier est trop gros.',
                         'mimeTypes' => ['image/jpeg', 'image/png', 'image/webp'],
                         'mimeTypesMessage' => 'Formats autorisés : JPEG, PNG, WEBP',
                     ]),
                 ],
             ])
             ->add('images', FileType::class, [
-                'label' => 'Images (jusqu\'à 6 fichiers)',
+                'label' => 'Images (2MO max) (jusqu\'à 6 fichiers)',
                 'multiple' => true,
                 'mapped' => false,
                 'required' => false,
@@ -163,7 +181,7 @@ class ProductType extends AbstractType
                     new All([
                         'constraints' => [
                             new File([
-                                'maxSize' => '8M',
+                                'maxSize' => '20M',
                                 'mimeTypes' => ['image/jpeg', 'image/png', 'image/webp'],
                                 'mimeTypesMessage' => 'Formats autorisés : JPEG, PNG, WEBP',
                             ]),

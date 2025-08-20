@@ -48,7 +48,7 @@ class ProductRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findByMainCategory(string $mainCategorySlug): array
+    public function findByMainCategory(?string $mainCategorySlug): array
     {
         return $this->createQueryBuilder('p')
             ->join('p.category', 'c')
@@ -60,7 +60,7 @@ class ProductRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findByMainCategoryAndGender(string $mainCategorySlug, string $genderCategory): array
+    public function findByMainCategoryAndGender(?string $mainCategorySlug, string $genderCategory): array
     {
         return $this->createQueryBuilder('p')
             ->join('p.category', 'c')

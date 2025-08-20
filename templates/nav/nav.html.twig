@@ -10,7 +10,7 @@
 
                         {# BOUTIQUE #}
                         <li>
-                            <a href="#">Boutique</a>
+                            <a href="#">{{ 'nav.shop'|trans }}</a>
                             <div class="uk-navbar-dropdown uk-navbar-dropdown-width-2">
                                 <div class="uk-drop-grid uk-child-width-1-3" uk-grid>
                                     <div>
@@ -19,16 +19,16 @@
                                                 <a href="#"><span class="material-symbols-outlined">apparel</span></a>
                                             </li>
                                             <li>
-                                                <a href="{{ path('product_index', {mainCategory:"vetements", genderCategory: "femme"}) }}">Femme</a>
+                                                <a href="{{ path('product_index', {mainCategory:"vetements", genderCategory: "femme"}) }}">{{'nav.women'|trans }}</a>
                                             </li>
                                             <li>
-                                                <a href="{{ path('product_index', {mainCategory:"vetements", genderCategory: "homme"}) }}">Homme</a>
+                                                <a href="{{ path('product_index', {mainCategory:"vetements", genderCategory: "homme"}) }}">{{  'nav.men'|trans }}</a>
                                             </li>
                                             <li>
-                                                <a href="{{ path('product_index', {mainCategory:"vetements", genderCategory: "enfant"}) }}">Enfant</a>
+                                                <a href="{{ path('product_index', {mainCategory:"vetements", genderCategory: "enfant"}) }}">{{ 'nav.child'|trans }}</a>
                                             </li>
                                             <li>
-                                                <a href="{{ path('product_index', {mainCategory:"vetements", genderCategory: "tout"}) }}">Voir tout</a>
+                                                <a href="{{ path('product_index', {mainCategory:"vetements", genderCategory: "tout"}) }}">{{ 'nav.all'|trans }}</a>
                                             </li>                                   
                                         </ul>
                                     </div>
@@ -38,22 +38,22 @@
                                                 footprint
                                             </span></a>
                                             </li>
-                                            <li> <a href="{{ path('product_index', {mainCategory:"chaussures", genderCategory: "femme"}) }}">Femme</a></li>
-                                            <li> <a href="{{ path('product_index', {mainCategory:"chaussures", genderCategory: "homme"}) }}">Homme</a></li>
-                                            <li> <a href="{{ path('product_index', {mainCategory:"chaussures", genderCategory: "enfant"}) }}">Enfant</a></li>
+                                            <li> <a href="{{ path('product_index', {mainCategory:"chaussures", genderCategory: "femme"}) }}">{{ 'nav.women'|trans }}</a></li>
+                                            <li> <a href="{{ path('product_index', {mainCategory:"chaussures", genderCategory: "homme"}) }}">{{ 'nav.men'|trans }}</a></li>
+                                            <li> <a href="{{ path('product_index', {mainCategory:"chaussures", genderCategory: "enfant"}) }}">{{ 'nav.child'|trans }}</a></li>
                                             <li>
-                                                <a href="{{ path('product_index', {mainCategory:"chaussures", genderCategory: "tout"}) }}">Voir tout</a>
+                                                <a href="{{ path('product_index', {mainCategory:"chaussures", genderCategory: "tout"}) }}">{{ 'nav.all'|trans }}</a>
                                             </li>
                                         </ul>
                                     </div>
                                     <div>
                                         <ul class="uk-nav uk-navbar-dropdown-nav">
                                             <li class="uk-active"><a href="#"><span class="">
-                                                Accessoires
+                                                {{ 'nav.accessories'|trans }}
                                             </span></a>
                                             </li>
                                             <li>
-                                                <a href="{{ path('product_index', {mainCategory:"accessoires", genderCategory: "tout"}) }}">Voir tout</a>
+                                                <a href="{{ path('product_index', {mainCategory:"accessoires", genderCategory: "tout"}) }}">{{ 'nav.all'|trans }}</a>
                                             </li>
                                         </ul>
                                     </div>
@@ -64,11 +64,11 @@
                         {# Vendre #}
                         {% if app.user %}
                         
-                        <li><a href="{{ path('product_new') }}">Vendre</a></li>
+                        <li><a href="{{ path('product_new') }}">{{ 'nav.sell'|trans }}</a></li>
                         
                         {% else %}
                         
-                        <li><a href="{{ path('login') }}">Vendre</a></li>
+                        <li><a href="{{ path('login') }}">{{ 'nav.sell'|trans }}</a></li>
                         
                         {% endif %}
 
@@ -80,15 +80,14 @@
                                     <div>
                                         <ul class="uk-nav uk-navbar-dropdown-nav">
                                             {% if app.user %}
-                                            <li class="uk-active"><a href="#">Gestion du compte</a></li>
-                                            <li><a href="#">Mon compte</a></li>
+                                            <li class="uk-active"><a href="#">{{ 'nav.account.management'|trans }}</a></li>
+                                            <li><a href="#">{{ 'nav.account'|trans }}</a></li>
                                             <li class="uk-nav-divider"></li>
                                             <li><a href="{{ path('logout') }}"><span uk-icon="icon: sign-out"></span>
-                                                    Déconnexion</a></li>
+                                                    {{ 'nav.signout'|trans }}</a></li>
                                             {% else %}
-                                            <li><a href="{{ path('login') }}"><span uk-icon="icon: sign-in"></span> Se
-                                                    connecter</a></li>
-                                            <li><a href="{{ path('register') }}">S'enregistrer</a></li>
+                                            <li><a href="{{ path('login') }}"><span uk-icon="icon: sign-in"></span>{{ 'nav.signin'|trans }}</a></li>
+                                            <li><a href="{{ path('register') }}">{{ 'nav.signup'|trans  }}</a></li>
                                             {% endif %}
                                         </ul>
                                     </div>
@@ -104,12 +103,16 @@
 
                                     <div>
                                         <ul class="uk-nav uk-navbar-dropdown-nav">
-                                            <li class="uk-nav-header">Panier</li>
-                                            <li><a href="#">Voir</a></li>                                    
+                                            <li class="uk-nav-header">{{ 'nav.basket'|trans }}</li>
+                                            <li><a href="#">{{ 'nav.see'|trans }}</a></li>                                    
                                         </ul>
                                     </div>
                                 </div>
                             </div>
+                        </li>
+                        <li class="nav-language">
+                            <a href="{{ path('change_locale', {'locale': 'fr'}) }}">🇫🇷 FR</a>
+                            <a href="{{ path('change_locale', {'locale': 'en'}) }}">🇬🇧 EN</a> 
                         </li>
                     </ul>
                 </div>
@@ -124,7 +127,7 @@
         <div class="uk-navbar-item">
             <form class="uk-search uk-search-navbar" method="GET" action="{{ path('product_search') }}">
                 <span uk-search-icon></span>
-                <input class="uk-search-input" type="search" name="q" placeholder="Rechercher" aria-label="Search" value="{{ app.request.query.get('q') }}">
+                <input class="uk-search-input" type="search" name="q" placeholder={{ "searchbar.placeholder"|trans }} aria-label="Search" value="{{ app.request.query.get('q') }}">
             </form>
         </div>
     </div>

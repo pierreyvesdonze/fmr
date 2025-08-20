@@ -129,4 +129,16 @@ ALERT / FLASH MESSAGE / MODAL
 
 .modal-delete-confirm button {
   margin-top: 10px;
+}
+
+/*
+ ***************************
+NAV
+ ***************************
+ */
+.nav-language {
+  display: flex !important;
+}
+.nav-language a {
+  margin-right: 0.5em !important;
 }/*# sourceMappingURL=style.css.map */

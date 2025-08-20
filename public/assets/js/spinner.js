@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		if (target && target.getAttribute("target") !== "_blank" && target.href && !target.href.startsWith("#")) {
 			// Vérifier si l'élément 'a' est un lien de navigation valide (pas une image ou un lien interne)
-			const isValidNavigation = !target.closest('a[href^="#"], a[href*="image"]'); // Exemple de filtre à adapter à tes besoins
+			const isValidNavigation = !target.closest('a[href^="#"], a[href*="image"], .uk-close'); // Exemple de filtre à adapter à tes besoins
 
 			if (isValidNavigation) {
 				showLoader();

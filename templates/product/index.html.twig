@@ -9,7 +9,7 @@
     {# Filtres #}
     <div class="uk-inline">
         <button class="uk-button uk-button-default" type="button" uk-toggle="target: #filterForm; animation: uk-animation-fade">
-            <span uk-icon="icon: settings"></span> Filtres
+            <span uk-icon="icon: settings"></span>{{ "filter.filters"|trans }}
         </button>
         
         <div id="filterForm" hidden class="uk-card uk-card-default uk-card-body uk-margin-top">
@@ -42,8 +42,7 @@
                     {{ form_end(form) }}
                 </fieldset>
             </section>
-            <a id="resetFilters" class="uk-link-muted" href="#">
-                Réinitialiser les filtres
+            <a id="resetFilters" class="uk-link-muted" href="#">{{ "filter.reset"|trans }}
             </a>
         </div>
     </div>
