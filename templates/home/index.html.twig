@@ -13,12 +13,12 @@
         <p class="uk-text-white uk-margin-small-top" style="font-size: 0.8rem; letter-spacing: 2px;">Since 1983</p>
         <br><br><br>
         <p uk-margin>
-            <a class="uk-button uk-button-default" href="{{ path('product_index', {mainCategory: "vetements",
-                genderCategory:'tout'}) }}">Voir la boutique</a>
+            <a class="uk-button uk-button-default" href="{{ path('product_index', {mainCategory: "clothes",
+                genderCategory:'tout'}) }}">{{ "homepage.shopnow"|trans }}</a>
                 {% if app.user %}
-                <a class="uk-button uk-button-default" href="{{ path('product_new') }}">Vendre un article</a>
+                <a class="uk-button uk-button-default" href="{{ path('product_new') }}">{{ "homepage.sellproduct"|trans }}</a>
                 {% else %}
-                <a class="uk-button uk-button-default" href="{{ path('login') }}">Vendre un article</a>
+                <a class="uk-button uk-button-default" href="{{ path('login') }}">{{ "homepage.sellproduct"|trans }}</a>
                 {% endif %}
         </p>
     </div>
@@ -157,16 +157,16 @@
 <div class="uk-flex uk-flex-center">
     <div class="uk-card uk-card-default uk-card-body">
         <p uk-margin>
-            <a class="uk-button uk-button-default" href="{{ path('product_index', {mainCategory:"vetements",
-                genderCategory:'tout'}) }}">Voir la boutique</a>
+            <a class="uk-button uk-button-default" href="{{ path('product_index', {mainCategory:"clothes",
+                genderCategory:'tout'}) }}">{{ "homepage.shopnow"|trans }}</a>
         </p>
     </div>
     <div class="uk-card uk-card-default uk-card-body uk-margin-left">
         <p uk-margin>
             {% if app.user %}
-            <a class="uk-button uk-button-default" href="{{ path('product_new') }}">Vendre un article</a>
+                <a class="uk-button uk-button-default" href="{{ path('product_new') }}">{{ "homepage.sellproduct"|trans }}</a>
             {% else %}
-            <a class="uk-button uk-button-default" href="{{ path('login') }}">Vendre un article</a>
+                <a class="uk-button uk-button-default" href="{{ path('login') }}">{{ "homepage.sellproduct"|trans }}</a>
             {% endif %}
         </p>
     </div>

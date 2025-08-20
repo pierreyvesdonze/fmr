@@ -136,5 +136,10 @@ color.turquoise: "Turquoise"
 color.vert: "Vert"
 color.violet: "Violet"
 
+#HOMEPAGE
+homepage:
+  shopnow: "Voir la boutique"
+  sellproduct: "Vendre un article"
+
 #SELL
 sell.titleform: "Vendre un produit"
