@@ -29,92 +29,92 @@ final class ProductController extends AbstractController
     public function __construct(private EntityManagerInterface $entityManager) {}
 
     #[Route('s/utilisateur/{userId}', name: 'product_user_index', methods: ['GET'])]
-#[Route('s/{mainCategory}/{genderCategory}', name: 'product_index', methods: ['GET', 'POST'])]
-#[Route('/recherche', name: 'product_search', methods: ['GET', 'POST'])]
-public function index(
-    ProductRepository $productRepository,
-    CategoryRepository $categoryRepository,
-    SizeRepository $sizeRepository,
-    BrandRepository $brandRepository,
-    ColorRepository $colorRepository,
-    MainCategoryRepository $mainCategoryRepository,
-    GenderCategoryRepository $genderCategoryRepository,
-    PaginatorInterface $paginator,
-    Request $request,
-    string $mainCategory = 'tout',
-    string $genderCategory = 'tout',
-    ?int $userId = null
-): Response {
+    #[Route('s/{mainCategory}/{genderCategory}', name: 'product_index', methods: ['GET', 'POST'])]
+    #[Route('/recherche', name: 'product_search', methods: ['GET', 'POST'])]
+    public function index(
+        ProductRepository $productRepository,
+        CategoryRepository $categoryRepository,
+        SizeRepository $sizeRepository,
+        BrandRepository $brandRepository,
+        ColorRepository $colorRepository,
+        MainCategoryRepository $mainCategoryRepository,
+        GenderCategoryRepository $genderCategoryRepository,
+        PaginatorInterface $paginator,
+        Request $request,
+        string $mainCategory = 'tout',
+        string $genderCategory = 'tout',
+        ?int $userId = null
+    ): Response {
 
-    // Formulaire de filtrage
-    $form = $this->createForm(FilterProductType::class, null, [
-        'categories'       => $categoryRepository->findAll(),
-        'sizes'            => $sizeRepository->findAll(),
-        'brands'           => $brandRepository->findAll(),
-        'colors'           => $colorRepository->findAll(),
-        'mainCategories'   => $mainCategoryRepository->findAll(),
-        'genderCategories' => $genderCategoryRepository->findAll(),
-    ]);
+        // Formulaire de filtrage
+        $form = $this->createForm(FilterProductType::class, null, [
+            'categories'       => $categoryRepository->findAll(),
+            'sizes'            => $sizeRepository->findAll(),
+            'brands'           => $brandRepository->findAll(),
+            'colors'           => $colorRepository->findAll(),
+            'mainCategories'   => $mainCategoryRepository->findAll(),
+            'genderCategories' => $genderCategoryRepository->findAll(),
+        ]);
 
-    $form->handleRequest($request);
-    $keyword = $request->query->get('q', '');
+        $form->handleRequest($request);
+        $keyword = $request->query->get('q', '');
 
-    // Récupération des entités MainCategory et GenderCategory
-    $mainCategoryEntity = $mainCategory !== 'tout' ? $mainCategoryRepository->findOneBy(['slug' => $mainCategory]) : null;
-    $genderCategoryEntity = $genderCategory !== 'tout' ? $genderCategoryRepository->findOneBy(['slug' => $genderCategory]) : null;
+        // Récupération des entités MainCategory et GenderCategory
+        $mainCategoryEntity = $mainCategory !== 'tout' ? $mainCategoryRepository->findOneBy(['slug' => $mainCategory]) : null;
+        $genderCategoryEntity = $genderCategory !== 'tout' ? $genderCategoryRepository->findOneBy(['slug' => $genderCategory]) : null;
 
-    // Si le formulaire est soumis, on récupère les valeurs filtrées
-    if ($form->isSubmitted() && $form->isValid()) {
-        $data = $form->getData();
-        if ($data['mainCategory'] instanceof MainCategory) {
-            $mainCategoryEntity = $data['mainCategory'];
+        // Si le formulaire est soumis, on récupère les valeurs filtrées
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            if ($data['mainCategory'] instanceof MainCategory) {
+                $mainCategoryEntity = $data['mainCategory'];
+            }
+            if ($data['genderCategory'] instanceof GenderCategory) {
+                $genderCategoryEntity = $data['genderCategory'];
+            }
         }
-        if ($data['genderCategory'] instanceof GenderCategory) {
-            $genderCategoryEntity = $data['genderCategory'];
+
+        // Préparer les variables à passer au repo
+        $mainCategorySlug = $mainCategoryEntity?->getSlug();
+        $genderCategoryName = $genderCategoryEntity?->getName();
+
+        // Récupération des produits
+        if ($userId !== null) {
+            $products = $productRepository->findByUserId($userId);
+        } elseif ($mainCategorySlug && $genderCategoryName) {
+            $products = $productRepository->findByMainCategoryAndGender($mainCategorySlug, $genderCategoryName);
+        } elseif ($mainCategorySlug) {
+            $products = $productRepository->findByMainCategory($mainCategorySlug);
+        } elseif ($genderCategoryName) {
+            $products = $productRepository->findByGenderCategory($genderCategoryName);
+        } else {
+            $products = $productRepository->findRandomAllProducts();
         }
+
+        // Filtrage par mot-clé
+        if ($keyword) {
+            $products = array_filter($products, function ($product) use ($keyword) {
+                return stripos($product->getName(), $keyword) !== false ||
+                    stripos($product->getCategory()?->getName(), $keyword) !== false ||
+                    stripos($product->getBrand()?->getName(), $keyword) !== false ||
+                    stripos($product->getColor()?->getName(), $keyword) !== false ||
+                    stripos($product->getSize()?->getName(), $keyword) !== false;
+            });
+        }
+
+        // Pagination
+        $pagination = $paginator->paginate(
+            $products,
+            $request->query->getInt('page', 1),
+            21
+        );
+
+        return $this->render('product/index.html.twig', [
+            'products'       => $pagination,
+            'genderCategory' => $genderCategory,
+            'form'           => $form->createView()
+        ]);
     }
-
-    // Préparer les variables à passer au repo
-    $mainCategorySlug = $mainCategoryEntity?->getSlug();
-    $genderCategoryName = $genderCategoryEntity?->getName();
-
-    // Récupération des produits
-    if ($userId !== null) {
-        $products = $productRepository->findByUserId($userId);
-    } elseif ($mainCategorySlug && $genderCategoryName) {
-        $products = $productRepository->findByMainCategoryAndGender($mainCategorySlug, $genderCategoryName);
-    } elseif ($mainCategorySlug) {
-        $products = $productRepository->findByMainCategory($mainCategorySlug);
-    } elseif ($genderCategoryName) {
-        $products = $productRepository->findByGenderCategory($genderCategoryName);
-    } else {
-        $products = $productRepository->findRandomAllProducts();
-    }
-
-    // Filtrage par mot-clé
-    if ($keyword) {
-        $products = array_filter($products, function ($product) use ($keyword) {
-            return stripos($product->getName(), $keyword) !== false ||
-                stripos($product->getCategory()?->getName(), $keyword) !== false ||
-                stripos($product->getBrand()?->getName(), $keyword) !== false ||
-                stripos($product->getColor()?->getName(), $keyword) !== false ||
-                stripos($product->getSize()?->getName(), $keyword) !== false;
-        });
-    }
-
-    // Pagination
-    $pagination = $paginator->paginate(
-        $products,
-        $request->query->getInt('page', 1),
-        21
-    );
-
-    return $this->render('product/index.html.twig', [
-        'products'       => $pagination,
-        'genderCategory' => $genderCategory,
-        'form'           => $form->createView()
-    ]);
-}
 
 
     #[Route('/nouveau', name: 'product_new', methods: ['GET', 'POST'])]

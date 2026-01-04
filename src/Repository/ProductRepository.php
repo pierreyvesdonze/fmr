@@ -20,7 +20,7 @@ class ProductRepository extends ServiceEntityRepository
     public function findByGenderCategory(string $genderCategory): array
     {
         $products = $this->createQueryBuilder('p')
-            ->innerJoin('p.genderCategory', 'g')
+            ->leftJoin('p.genderCategory', 'g')
             ->andWhere('g.name = :genderCategory')
             ->setParameter('genderCategory', $genderCategory)
             ->getQuery()
@@ -65,9 +65,9 @@ class ProductRepository extends ServiceEntityRepository
     public function findByMainCategoryAndGender(?string $mainCategorySlug, string $genderCategory): array
     {
         return $this->createQueryBuilder('p')
-            ->innerJoin('p.category', 'c')
-            ->innerJoin('c.mainCategory', 'm')
-            ->innerJoin('p.genderCategory', 'g')
+            ->leftJoin('p.category', 'c')
+            ->leftJoin('c.mainCategory', 'm')
+            ->leftJoin('p.genderCategory', 'g') // ← leftJoin
             ->where('m.slug = :mainCategory')
             ->andWhere('g.name = :genderCategory')
             ->setParameter('mainCategory', $mainCategorySlug)
