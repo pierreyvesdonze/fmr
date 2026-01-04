@@ -51,6 +51,9 @@ class GenderCategory
         return $this;
     }
 
+    #[ORM\Column(length: 255, unique: true)]
+    private ?string $slug = null;
+
     /**
      * @return Collection<int, Product>
      */
@@ -78,6 +81,17 @@ class GenderCategory
             }
         }
 
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): static
+    {
+        $this->slug = $slug;
         return $this;
     }
 }

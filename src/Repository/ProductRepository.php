@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -17,28 +16,29 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
+    // Récupère les produits par catégorie de genre (ex: Femme, Homme, Non genré)
     public function findByGenderCategory(string $genderCategory): array
     {
         $products = $this->createQueryBuilder('p')
-            ->innerJoin('p.genderCategory', 'c')
-            ->andWhere('c.name = :genderCategory')
+            ->innerJoin('p.genderCategory', 'g')
+            ->andWhere('g.name = :genderCategory')
             ->setParameter('genderCategory', $genderCategory)
             ->getQuery()
             ->getResult();
 
-        shuffle($products); // Mélange les produits aléatoirement
-
-        return array_slice($products, 0);
+        shuffle($products); // Mélange aléatoire
+        return $products;
     }
 
+    // Récupère tous les produits de façon aléatoire
     public function findRandomAllProducts(): array
     {
-        $products = $this->findAll(); // Récupère tous les produits
-
-        shuffle($products); // Mélange les produits aléatoirement
-        return array_slice($products, 0);
+        $products = $this->findAll();
+        shuffle($products);
+        return $products;
     }
 
+    // Récupère les produits d’un utilisateur spécifique
     public function findByUserId($userId): array
     {
         return $this->createQueryBuilder('p')
@@ -48,11 +48,12 @@ class ProductRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    // Récupère les produits par slug de catégorie principale
     public function findByMainCategory(?string $mainCategorySlug): array
     {
         return $this->createQueryBuilder('p')
-            ->join('p.category', 'c')
-            ->join('c.mainCategory', 'm')
+            ->innerJoin('p.category', 'c')
+            ->innerJoin('c.mainCategory', 'm')
             ->where('m.slug = :mainCategory')
             ->setParameter('mainCategory', $mainCategorySlug)
             ->orderBy('p.id', 'DESC')
@@ -60,12 +61,13 @@ class ProductRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    // Récupère les produits par catégorie principale ET catégorie de genre
     public function findByMainCategoryAndGender(?string $mainCategorySlug, string $genderCategory): array
     {
         return $this->createQueryBuilder('p')
-            ->join('p.category', 'c')
-            ->join('c.mainCategory', 'm')
-            ->join('p.genderCategory', 'g')
+            ->innerJoin('p.category', 'c')
+            ->innerJoin('c.mainCategory', 'm')
+            ->innerJoin('p.genderCategory', 'g')
             ->where('m.slug = :mainCategory')
             ->andWhere('g.name = :genderCategory')
             ->setParameter('mainCategory', $mainCategorySlug)
@@ -75,15 +77,16 @@ class ProductRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    // Recherche filtrée via différents paramètres (utilisé par le formulaire)
     public function findFilteredProducts(array $filters)
     {
         $qb = $this->createQueryBuilder('p')
-            ->leftJoin('p.category', 'c')
+            ->innerJoin('p.category', 'c')
+            ->innerJoin('c.mainCategory', 'mc')
+            ->innerJoin('p.genderCategory', 'g')
             ->leftJoin('p.size', 's')
             ->leftJoin('p.brand', 'b')
-            ->leftJoin('p.color', 'co')
-            ->leftJoin('c.mainCategory', 'mc')
-            ->leftJoin('p.genderCategory', 'g');
+            ->leftJoin('p.color', 'co');
 
         if (!empty($filters['category'])) {
             $qb->andWhere('c.id = :category')
@@ -118,16 +121,23 @@ class ProductRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    // Recherche par mot-clé
     public function searchByKeyword(string $keyword)
     {
         return $this->createQueryBuilder('p')
+            ->innerJoin('p.brand', 'b')
+            ->innerJoin('p.category', 'c')
+            ->innerJoin('p.color', 'co')
+            ->innerJoin('p.size', 's')
+            ->innerJoin('p.genderCategory', 'g')
             ->where('p.name LIKE :keyword')
             ->orWhere('p.description LIKE :keyword')
             ->orWhere('p.wear LIKE :keyword')
             ->orWhere('b.name LIKE :keyword')
             ->orWhere('c.name LIKE :keyword')
-            ->leftJoin('p.brand', 'b')
-            ->leftJoin('p.color', 'c')
+            ->orWhere('co.name LIKE :keyword')
+            ->orWhere('s.name LIKE :keyword')
+            ->orWhere('g.name LIKE :keyword')
             ->setParameter('keyword', '%' . $keyword . '%')
             ->getQuery()
             ->getResult();
